@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440">
+  <defs>
+    <path id="leaf" d="M0,0 C7,-30 7,-60 0,-85 C-7,-60 -7,-30 0,0 Z"/>
+    <ellipse id="petal" cx="0" cy="-13" rx="5" ry="11"/>
+    <g id="flower-gold">
+      <use href="#petal" fill="#e3a83b" transform="rotate(0)"/>
+      <use href="#petal" fill="#d9822b" transform="rotate(45)"/>
+      <use href="#petal" fill="#e3a83b" transform="rotate(90)"/>
+      <use href="#petal" fill="#d9822b" transform="rotate(135)"/>
+      <use href="#petal" fill="#e3a83b" transform="rotate(180)"/>
+      <use href="#petal" fill="#d9822b" transform="rotate(225)"/>
+      <use href="#petal" fill="#e3a83b" transform="rotate(270)"/>
+      <use href="#petal" fill="#d9822b" transform="rotate(315)"/>
+      <circle r="7" fill="#6b4a2e"/>
+    </g>
+    <g id="flower-red">
+      <use href="#petal" fill="#b34a35" transform="rotate(0)"/>
+      <use href="#petal" fill="#9c3d2c" transform="rotate(45)"/>
+      <use href="#petal" fill="#b34a35" transform="rotate(90)"/>
+      <use href="#petal" fill="#9c3d2c" transform="rotate(135)"/>
+      <use href="#petal" fill="#b34a35" transform="rotate(180)"/>
+      <use href="#petal" fill="#9c3d2c" transform="rotate(225)"/>
+      <use href="#petal" fill="#b34a35" transform="rotate(270)"/>
+      <use href="#petal" fill="#9c3d2c" transform="rotate(315)"/>
+      <circle r="6" fill="#5c3a2a"/>
+    </g>
+  </defs>
+
+  <!-- leaves -->
+  <use href="#leaf" fill="#8b8a5c" transform="translate(220 220) rotate(0) translate(0 -125)"/>
+  <use href="#leaf" fill="#7a5c52" transform="translate(220 220) rotate(30) translate(0 -125)"/>
+  <use href="#leaf" fill="#8b8a5c" transform="translate(220 220) rotate(60) translate(0 -125)"/>
+  <use href="#leaf" fill="#7a5c52" transform="translate(220 220) rotate(90) translate(0 -125)"/>
+  <use href="#leaf" fill="#8b8a5c" transform="translate(220 220) rotate(120) translate(0 -125)"/>
+  <use href="#leaf" fill="#7a5c52" transform="translate(220 220) rotate(240) translate(0 -125)"/>
+  <use href="#leaf" fill="#8b8a5c" transform="translate(220 220) rotate(270) translate(0 -125)"/>
+  <use href="#leaf" fill="#7a5c52" transform="translate(220 220) rotate(300) translate(0 -125)"/>
+  <use href="#leaf" fill="#8b8a5c" transform="translate(220 220) rotate(330) translate(0 -125)"/>
+
+  <!-- flowers -->
+  <use href="#flower-gold" transform="translate(220 220) rotate(45) translate(0 -120)"/>
+  <use href="#flower-red"  transform="translate(220 220) rotate(105) translate(0 -120)"/>
+  <use href="#flower-gold" transform="translate(220 220) rotate(130) translate(0 -118)"/>
+  <use href="#flower-gold" transform="translate(220 220) rotate(230) translate(0 -118)"/>
+  <use href="#flower-red"  transform="translate(220 220) rotate(255) translate(0 -120)"/>
+  <use href="#flower-gold" transform="translate(220 220) rotate(315) translate(0 -120)"/>
+</svg>

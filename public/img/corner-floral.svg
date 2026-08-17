@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <path id="leaf-c" d="M0,0 C7,-26 7,-52 0,-76 C-7,-52 -7,-26 0,0 Z"/>
+    <ellipse id="petal-c" cx="0" cy="-12" rx="5" ry="11"/>
+    <path id="petal-star" d="M0,0 C 5,-10 9,-20 0,-34 C -9,-20 -5,-10 0,0 Z"/>
+
+    <g id="flower-c-gold">
+      <use href="#petal-c" fill="#e3a83b" transform="rotate(0)"/>
+      <use href="#petal-c" fill="#d9822b" transform="rotate(45)"/>
+      <use href="#petal-c" fill="#e3a83b" transform="rotate(90)"/>
+      <use href="#petal-c" fill="#d9822b" transform="rotate(135)"/>
+      <use href="#petal-c" fill="#e3a83b" transform="rotate(180)"/>
+      <use href="#petal-c" fill="#d9822b" transform="rotate(225)"/>
+      <use href="#petal-c" fill="#e3a83b" transform="rotate(270)"/>
+      <use href="#petal-c" fill="#d9822b" transform="rotate(315)"/>
+      <circle r="7" fill="#6b4a2e"/>
+    </g>
+
+    <g id="flower-c-red">
+      <use href="#petal-c" fill="#b34a35" transform="rotate(0)"/>
+      <use href="#petal-c" fill="#9c3d2c" transform="rotate(45)"/>
+      <use href="#petal-c" fill="#b34a35" transform="rotate(90)"/>
+      <use href="#petal-c" fill="#9c3d2c" transform="rotate(135)"/>
+      <use href="#petal-c" fill="#b34a35" transform="rotate(180)"/>
+      <use href="#petal-c" fill="#9c3d2c" transform="rotate(225)"/>
+      <use href="#petal-c" fill="#b34a35" transform="rotate(270)"/>
+      <use href="#petal-c" fill="#9c3d2c" transform="rotate(315)"/>
+      <circle r="6" fill="#5c3a2a"/>
+    </g>
+
+    <g id="flower-c-star">
+      <use href="#petal-star" fill="#d9822b" transform="rotate(0)"/>
+      <use href="#petal-star" fill="#c9702e" transform="rotate(60)"/>
+      <use href="#petal-star" fill="#d9822b" transform="rotate(120)"/>
+      <use href="#petal-star" fill="#c9702e" transform="rotate(180)"/>
+      <use href="#petal-star" fill="#d9822b" transform="rotate(240)"/>
+      <use href="#petal-star" fill="#c9702e" transform="rotate(300)"/>
+      <circle r="6" fill="#6b4a2e"/>
+    </g>
+  </defs>
+
+  <path d="M0,4 C 45,32 100,64 145,110 C 182,148 210,180 238,215"
+        fill="none" stroke="#8a7050" stroke-width="1.5"/>
+
+  <use href="#leaf-c" fill="#8b8a5c" transform="translate(28 18) rotate(-32)"/>
+  <use href="#leaf-c" fill="#7a5c52" transform="translate(50 42) rotate(148)"/>
+  <use href="#leaf-c" fill="#8b8a5c" transform="translate(85 68) rotate(-26)"/>
+  <use href="#leaf-c" fill="#7a5c52" transform="translate(115 95) rotate(158)"/>
+  <use href="#leaf-c" fill="#8b8a5c" transform="translate(150 122) rotate(-18)"/>
+  <use href="#leaf-c" fill="#7a5c52" transform="translate(185 155) rotate(153)"/>
+  <use href="#leaf-c" fill="#8b8a5c" transform="translate(215 182) rotate(-15)"/>
+  <use href="#leaf-c" fill="#7a5c52" transform="translate(235 208) rotate(140)"/>
+
+  <circle cx="66" cy="52" r="3.5" fill="#6b5b58"/>
+  <circle cx="78" cy="45" r="3" fill="#7a5c52"/>
+  <circle cx="90" cy="40" r="2.5" fill="#8b8a5c"/>
+  <circle cx="150" cy="105" r="3.5" fill="#6b5b58"/>
+  <circle cx="162" cy="98" r="3" fill="#7a5c52"/>
+
+  <use href="#flower-c-gold" transform="translate(38 30) scale(1.55)"/>
+  <use href="#flower-c-star" transform="translate(90 22) scale(1.15)"/>
+  <use href="#flower-c-red"  transform="translate(120 92) scale(1.2)"/>
+  <use href="#flower-c-star" transform="translate(178 145) scale(1.1)"/>
+  <use href="#flower-c-gold" transform="translate(215 190) scale(1.55)"/>
+  <use href="#flower-c-red"  transform="translate(178 225) scale(1.1)"/>
+</svg>

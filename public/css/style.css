@@ -457,6 +457,12 @@ h1, h2, h3 {
   gap: 1.2rem;
 }
 
+.rsvp-form[hidden],
+.rsvp-success[hidden],
+.rsvp-invalid[hidden] {
+  display: none;
+}
+
 .rsvp-form label {
   display: block;
   font-family: var(--font-ui);

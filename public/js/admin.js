@@ -48,7 +48,7 @@ supabase.auth.onAuthStateChange((_event, session) => {
 async function loadRsvps() {
   const { data, error } = await supabase
     .from('rsvps')
-    .select('*')
+    .select('*, invitados(nombre)')
     .order('creado_en', { ascending: false });
 
   if (error) {
@@ -73,7 +73,7 @@ function renderRows(rows) {
   let totalPases = 0;
 
   rows.forEach((row) => {
-    totalPases += Number(row.cantidad_pases) || 0;
+    totalPases += (Number(row.pases_adultos) || 0) + (Number(row.pases_ninos) || 0);
 
     const fecha = row.creado_en
       ? new Date(row.creado_en).toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' })
@@ -82,7 +82,9 @@ function renderRows(rows) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${fecha}</td>
-      <td>${row.cantidad_pases ?? ''}</td>
+      <td>${escapeHtml(row.invitados?.nombre || '—')}</td>
+      <td>${row.pases_adultos ?? 0}</td>
+      <td>${row.pases_ninos ?? 0}</td>
       <td>${escapeHtml(row.nombres_asistentes || '')}</td>
       <td>${escapeHtml(row.mensaje || '')}</td>
       <td><input type="text" value="${escapeHtml(row.mesa || '')}" data-id="${row.id}" placeholder="Ej: Mesa 3"></td>

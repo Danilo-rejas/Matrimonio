@@ -271,13 +271,22 @@
     <h2>Te esperamos</h2>
   </div>
 
-  <form class="rsvp-form" id="rsvp-form">
-    <div>
-      <label for="cantidadPases">Cantidad de pases</label>
-      <input type="number" id="cantidadPases" name="cantidadPases" min="1" max="10" required>
+  <p class="rsvp-invalid" id="rsvp-invalid" hidden>Este enlace no es válido. Por favor usa el enlace personalizado que te enviamos.</p>
+
+  <form class="rsvp-form" id="rsvp-form" hidden>
+    <p class="rsvp-greeting" id="rsvp-greeting"></p>
+    <div class="rsvp-pases">
+      <div>
+        <label for="pasesAdultos">Pases para adultos</label>
+        <select id="pasesAdultos" name="pasesAdultos" required></select>
+      </div>
+      <div>
+        <label for="pasesNinos">Pases para niños</label>
+        <select id="pasesNinos" name="pasesNinos" required></select>
+      </div>
     </div>
     <div>
-      <label for="nombresAsistentes">Nombres de los asistentes</label>
+      <label for="nombresAsistentes">Nombres de los que asistirán</label>
       <textarea id="nombresAsistentes" name="nombresAsistentes" required placeholder="Escribe el nombre completo de cada persona"></textarea>
     </div>
     <div>

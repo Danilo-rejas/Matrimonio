@@ -468,6 +468,7 @@ h1, h2, h3 {
 }
 
 .rsvp-form input,
+.rsvp-form select,
 .rsvp-form textarea {
   width: 100%;
   font-family: var(--font-body);
@@ -482,6 +483,51 @@ h1, h2, h3 {
 .rsvp-form textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+.rsvp-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239c4a32' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1rem;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+.rsvp-form select:focus,
+.rsvp-form input:focus,
+.rsvp-form textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.rsvp-pases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+@media (max-width: 480px) {
+  .rsvp-pases {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rsvp-greeting {
+  font-family: var(--font-script), var(--font-display);
+  font-size: 1.3rem;
+  color: var(--color-accent-dark);
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+
+.rsvp-invalid {
+  max-width: 480px;
+  margin: 1.5rem auto 0;
+  text-align: center;
+  color: var(--color-muted);
 }
 
 .btn {

@@ -392,6 +392,18 @@ h1, h2, h3 {
   margin: 0 auto 1.25rem;
 }
 
+.rsvp-success {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: rsvp-success-in 0.7s ease both;
+}
+
+@keyframes rsvp-success-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .countdown {
   margin-top: 1.5rem;
 }

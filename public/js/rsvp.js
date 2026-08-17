@@ -3,6 +3,7 @@ import { supabase } from './supabase-config.js';
 const form = document.getElementById('rsvp-form');
 const statusEl = document.getElementById('rsvp-status');
 const submitBtn = document.getElementById('rsvp-submit');
+const successEl = document.getElementById('rsvp-success');
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -35,7 +36,8 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  statusEl.textContent = '¡Gracias por confirmar! Los esperamos.';
-  statusEl.className = 'form-status form-status--ok';
   form.reset();
+  form.hidden = true;
+  successEl.hidden = false;
+  successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });

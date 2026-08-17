@@ -384,6 +384,15 @@ h1, h2, h3 {
 .note-box .corner-floral--tl { top: -16px; left: -16px; }
 .note-box .corner-floral--br { bottom: -16px; right: -16px; transform: scale(-1, -1); }
 
+.note-box__photo {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin: 0 auto 1.25rem;
+  border-radius: 8px;
+}
+
 .footer__flourish {
   display: block;
   width: 130px;

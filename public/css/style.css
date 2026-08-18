@@ -781,12 +781,44 @@ table.rsvp-table {
 }
 
 .cover__invitado {
-  margin: 1.1rem 0 0;
+  margin: 1.8rem 0 0;
+}
+
+.cover__invitado-line {
+  display: block;
+  width: 90px;
+  margin: 0 auto 0.9rem;
+  opacity: 0.55;
+}
+
+.cover__invitado-label {
   font-family: var(--font-ui);
-  letter-spacing: 0.05em;
-  font-size: 0.8rem;
-  color: var(--color-text);
-  opacity: 0.75;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: var(--color-muted);
+  margin: 0 0 0.35rem;
+}
+
+.cover__invitado-nombre {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: var(--color-accent-dark);
+  margin: 0 0 0.6rem;
+}
+
+.cover__invitado-pases {
+  display: inline-block;
+  font-family: var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--color-gold-line);
+  border: 1px solid var(--color-line);
+  border-radius: 50px;
+  padding: 0.3rem 1rem;
 }
 
 body.cover-active {

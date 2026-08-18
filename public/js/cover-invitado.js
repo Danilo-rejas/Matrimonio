@@ -2,7 +2,9 @@ import { supabase } from './supabase-config.js';
 
 async function init() {
   const el = document.getElementById('cover-invitado');
-  if (!el) return;
+  const nombreEl = document.getElementById('cover-invitado-nombre');
+  const pasesEl = document.getElementById('cover-invitado-pases');
+  if (!el || !nombreEl || !pasesEl) return;
 
   const codigo = new URLSearchParams(window.location.search).get('inv');
   if (!codigo) return;
@@ -16,9 +18,9 @@ async function init() {
   if (error || !invitado) return;
 
   const totalPases = invitado.max_adultos + invitado.max_ninos;
-  const textoPases = totalPases === 1 ? '1 pase' : `${totalPases} pases`;
 
-  el.textContent = `Invitación para ${invitado.nombre} · ${textoPases}`;
+  nombreEl.textContent = invitado.nombre;
+  pasesEl.textContent = totalPases === 1 ? '1 pase' : `${totalPases} pases`;
   el.hidden = false;
 }
 

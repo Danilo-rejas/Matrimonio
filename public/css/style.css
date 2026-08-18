@@ -663,7 +663,7 @@ table.rsvp-table {
   width: 50%;
   height: 100%;
   background: var(--color-bg);
-  transition: transform 11.5s cubic-bezier(0.45, 0, 0.4, 1);
+  transition: transform 6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .cover__panel--left { border-right: 1px solid var(--color-line); }
@@ -705,7 +705,7 @@ table.rsvp-table {
   z-index: 2;
   width: min(88vw, 460px);
   text-align: center;
-  transition: opacity 2.4s ease, transform 2.6s ease;
+  transition: opacity 1.6s ease, transform 1.8s ease;
 }
 
 .cover--open .cover__content {
@@ -715,9 +715,9 @@ table.rsvp-table {
 }
 
 .cover-leaves-layer {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 3;
+  z-index: 1000;
   overflow: hidden;
   pointer-events: none;
 }

@@ -780,6 +780,15 @@ table.rsvp-table {
   color: #fff;
 }
 
+.cover__invitado {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-ui);
+  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  opacity: 0.75;
+}
+
 body.cover-active {
   overflow: hidden;
   height: 100vh;

@@ -647,7 +647,7 @@ table.rsvp-table {
   padding: 0;
 }
 
-/* --- Portada / "carta" que se abre --- */
+/* --- Portada / cortina doble que se abre --- */
 .cover {
   position: fixed;
   inset: 0;
@@ -656,16 +656,21 @@ table.rsvp-table {
   overflow: hidden;
 }
 
+.cover--open { pointer-events: none; }
+
 .cover__panel {
   position: relative;
   width: 50%;
   height: 100%;
   background: var(--color-bg);
-  transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 11.5s cubic-bezier(0.45, 0, 0.4, 1);
 }
 
 .cover__panel--left { border-right: 1px solid var(--color-line); }
 .cover__panel--right { border-left: 1px solid var(--color-line); }
+
+.cover--open .cover__panel--left { transform: translateX(-100%); }
+.cover--open .cover__panel--right { transform: translateX(100%); }
 
 .cover__frame {
   position: absolute;
@@ -675,6 +680,8 @@ table.rsvp-table {
   z-index: 1;
   transition: opacity 0.5s ease;
 }
+
+.cover--open .cover__frame { opacity: 0; }
 
 .cover__floral-frame {
   position: absolute;
@@ -698,7 +705,64 @@ table.rsvp-table {
   z-index: 2;
   width: min(88vw, 460px);
   text-align: center;
-  transition: opacity 0.6s ease, transform 0.8s ease;
+  transition: opacity 2.4s ease, transform 2.6s ease;
+}
+
+.cover--open .cover__content {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.92);
+  pointer-events: none;
+}
+
+.cover-leaves-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cover-leaf {
+  position: absolute;
+  top: -12%;
+  left: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: cover-leaf-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.cover-leaf img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes cover-leaf-fall {
+  0% {
+    transform: translate(0, 0) rotate(var(--leaf-rot-start));
+    opacity: 0;
+  }
+  6% { opacity: var(--leaf-opacity); }
+  28% {
+    transform: translate(calc(var(--leaf-drift) * 0.35), 62vh)
+      rotate(calc(var(--leaf-rot-start) + var(--leaf-rot-amount) * 0.4));
+  }
+  55% {
+    transform: translate(calc(var(--leaf-drift) * -0.4), 115vh)
+      rotate(calc(var(--leaf-rot-start) + var(--leaf-rot-amount) * 0.65));
+  }
+  80% {
+    transform: translate(calc(var(--leaf-drift) * 0.55), 165vh)
+      rotate(calc(var(--leaf-rot-start) + var(--leaf-rot-amount) * 0.9));
+  }
+  96% { opacity: var(--leaf-opacity); }
+  100% {
+    transform: translate(calc(var(--leaf-drift) * 0.15), 230vh)
+      rotate(calc(var(--leaf-rot-start) + var(--leaf-rot-amount)));
+    opacity: 0;
+  }
 }
 
 .cover__eyebrow {
@@ -782,6 +846,14 @@ table.rsvp-table {
 
 .cover__invitado {
   margin: 1.8rem 0 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.cover__invitado--visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .cover__invitado-line {
@@ -825,15 +897,6 @@ table.rsvp-table {
 body.cover-active {
   overflow: hidden;
   height: 100vh;
-}
-
-.cover--open .cover__panel--left { transform: translateX(-100%); }
-.cover--open .cover__panel--right { transform: translateX(100%); }
-.cover--open .cover__frame { opacity: 0; }
-.cover--open .cover__content {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.92);
-  pointer-events: none;
 }
 
 /* --- Monograma (estilo save the date) y tarjetas florales reutilizables --- */

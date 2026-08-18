@@ -22,6 +22,7 @@ async function init() {
   nombreEl.textContent = invitado.nombre;
   pasesEl.textContent = totalPases === 1 ? '1 pase' : `${totalPases} pases`;
   el.hidden = false;
+  requestAnimationFrame(() => el.classList.add('cover__invitado--visible'));
 }
 
 init();

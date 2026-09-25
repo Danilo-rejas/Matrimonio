@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=39">
+<link rel="stylesheet" href="css/style.css?v=40">
 </head>
 <body class="cover-active">
 
@@ -20,8 +20,8 @@
   <div class="cover__panel cover__panel--right"></div>
 
   <div class="cover__content">
-    <div class="cover__painting">
-      <img src="img/fotos/pintura-portada.jpg" alt="Alondra y Julio, pintura">
+    <div class="cover__portrait">
+      <img src="img/fotos/portada.jpg" alt="Alondra y Julio">
     </div>
     <img class="cover__flourish-line" src="img/flourish-line.svg" alt="">
 
@@ -53,8 +53,8 @@
 <section class="hero reveal">
   <p class="eyebrow">Nos casamos</p>
   <h1 class="hero__names">Alondra<span class="hero__and">&amp;</span>Julio</h1>
-  <div class="hero__painting">
-    <img src="img/fotos/acuarela-hero.jpg" alt="Alondra y Julio, acuarela">
+  <div class="hero__photo">
+    <img src="img/fotos/hero.jpg" alt="Alondra y Julio">
   </div>
   <img class="divider divider--hero" src="img/guirnalda.png" alt="">
 </section>
@@ -87,24 +87,48 @@
 <section class="section reveal" id="historia">
   <p class="eyebrow">Nuestra historia</p>
   <h2>Momentos que nos trajeron hasta aquí</h2>
-  <div class="historia reveal-stagger">
-    <figure class="historia__foto historia__foto--ancha" data-full="img/fotos/historia-balcon.jpg" data-pie="Donde todo comenzó">
-      <img src="img/fotos/historia-balcon.jpg" alt="Alondra y Julio en el balcón" loading="lazy">
+  <div class="galeria reveal-stagger">
+    <figure class="galeria__item galeria__item--ancha" data-full="img/fotos/h-balcon.jpg" data-pie="Donde todo comenzó">
+      <img src="img/fotos/h-balcon.jpg" alt="Alondra y Julio en el balcón" loading="lazy">
       <figcaption>Donde todo comenzó</figcaption>
     </figure>
-    <figure class="historia__foto" data-full="img/fotos/historia-portal.jpg" data-pie="Nuestro refugio">
-      <img src="img/fotos/historia-portal.jpg" alt="Alondra y Julio en el portal" loading="lazy">
+    <figure class="galeria__item" data-full="img/fotos/h-portal.jpg" data-pie="Nuestro refugio">
+      <img src="img/fotos/h-portal.jpg" alt="Alondra y Julio en el portal" loading="lazy">
       <figcaption>Nuestro refugio</figcaption>
     </figure>
-    <figure class="historia__foto historia__foto--ancha" data-full="img/fotos/historia-beso.jpg" data-pie="Para siempre">
-      <img src="img/fotos/historia-beso.jpg" alt="Alondra besa a Julio en la mejilla" loading="lazy">
-      <figcaption>Para siempre</figcaption>
+    <figure class="galeria__item" data-full="img/fotos/h-escalera.jpg" data-pie="Paso a paso">
+      <img src="img/fotos/h-escalera.jpg" alt="Alondra y Julio bajando la escalera" loading="lazy">
+      <figcaption>Paso a paso</figcaption>
+    </figure>
+    <figure class="galeria__item galeria__item--ancha" data-full="img/fotos/h-camino.jpg" data-pie="De la mano">
+      <img src="img/fotos/h-camino.jpg" alt="Alondra y Julio caminando de la mano" loading="lazy">
+      <figcaption>De la mano</figcaption>
+    </figure>
+    <figure class="galeria__item" data-full="img/fotos/h-alondra.jpg" data-pie="Alondra">
+      <img src="img/fotos/h-alondra.jpg" alt="Alondra entre flores" loading="lazy">
+      <figcaption>Alondra</figcaption>
+    </figure>
+    <figure class="galeria__item" data-full="img/fotos/h-flores.jpg" data-pie="Entre flores">
+      <img src="img/fotos/h-flores.jpg" alt="Alondra y Julio entre buganvillas" loading="lazy">
+      <figcaption>Entre flores</figcaption>
+    </figure>
+    <figure class="galeria__item" data-full="img/fotos/h-julio.jpg" data-pie="Julio">
+      <img src="img/fotos/h-julio.jpg" alt="Julio en el jardín" loading="lazy">
+      <figcaption>Julio</figcaption>
+    </figure>
+    <figure class="galeria__item galeria__item--ancha" data-full="img/fotos/h-jardin.jpg" data-pie="Nuestro jardín">
+      <img src="img/fotos/h-jardin.jpg" alt="Alondra y Julio sentados en el jardín" loading="lazy">
+      <figcaption>Nuestro jardín</figcaption>
+    </figure>
+    <figure class="galeria__item" data-full="img/fotos/h-juntos.jpg" data-pie="Juntos">
+      <img src="img/fotos/h-juntos.jpg" alt="Alondra y Julio caminando juntos" loading="lazy">
+      <figcaption>Juntos</figcaption>
     </figure>
   </div>
 </section>
 
-<section class="foto-banner reveal">
-  <img class="foto-banner__img" src="img/fotos/jardin.jpg" alt="" loading="lazy">
+<section class="foto-banner reveal" data-parallax>
+  <img class="foto-banner__img" src="img/fotos/banner-jardin.jpg" alt="" loading="lazy">
   <div class="foto-banner__inner">
     <p class="eyebrow">Nuestra promesa</p>
     <p class="quote">
@@ -354,6 +378,15 @@
   </div>
 </section>
 
+<section class="foto-banner foto-banner--final reveal" data-parallax>
+  <img class="foto-banner__img" src="img/fotos/banner-final.jpg" alt="" loading="lazy">
+  <div class="foto-banner__inner">
+    <p class="eyebrow">Gracias por acompañarnos</p>
+    <p class="foto-banner__titulo">Los esperamos</p>
+    <p class="foto-banner__fecha">12 · 12 · 2026</p>
+  </div>
+</section>
+
 <footer>
   <img class="footer__flourish" src="img/flourish-line.svg" alt="">
   Alondra &amp; Julio · 12.12.2026
@@ -364,7 +397,7 @@
 <script src="js/cover-leaves.js?v=3"></script>
 <script type="module" src="js/cover-invitado.js?v=3"></script>
 <script src="js/reveal.js?v=3"></script>
-<script src="js/fotos.js?v=1"></script>
+<script src="js/fotos.js?v=2"></script>
 <script type="module" src="js/rsvp.js?v=5"></script>
 </body>
 </html>

@@ -4,18 +4,21 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- Parallax suave del banner (la foto se desplaza más lento que el scroll)
-  var banner = document.querySelector('.foto-banner');
-  var bannerImg = banner && banner.querySelector('.foto-banner__img');
-  if (banner && bannerImg && !reduce) {
+  var banners = document.querySelectorAll('[data-parallax]');
+  if (banners.length && !reduce) {
     var ticking = false;
     function mover() {
       ticking = false;
-      var r = banner.getBoundingClientRect();
       var vh = window.innerHeight || 1;
-      if (r.bottom < 0 || r.top > vh) return;
-      // -1 (arriba) … 1 (abajo) según la posición del banner en la pantalla
-      var p = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
-      bannerImg.style.transform = 'translate3d(0,' + (p * -12).toFixed(2) + '%,0) scale(1.18)';
+      banners.forEach(function (banner) {
+        var img = banner.querySelector('.foto-banner__img');
+        if (!img) return;
+        var r = banner.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        // -1 (arriba) … 1 (abajo) según la posición del banner en la pantalla
+        var p = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
+        img.style.transform = 'translate3d(0,' + (p * -12).toFixed(2) + '%,0) scale(1.18)';
+      });
     }
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(mover); }
@@ -25,7 +28,7 @@
   }
 
   // ---- Visor de fotos (lightbox)
-  var fotos = document.querySelectorAll('.historia__foto');
+  var fotos = document.querySelectorAll('.galeria__item');
   if (!fotos.length) return;
 
   var visor = document.createElement('div');

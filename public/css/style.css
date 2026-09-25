@@ -2464,3 +2464,81 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
   .parents__group { flex-basis: 100%; }
   .parents__ornament { flex-basis: 100%; width: auto; max-width: 110px; margin: 0 auto; }
 }
+
+/* =====================================================================
+   Títulos adornados: cada sección con su propia composición de hojas
+   ===================================================================== */
+.titulo-adornado {
+  position: relative;
+  width: min(92vw, 500px);
+  margin: 0 auto;
+}
+
+.adorno {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.adorno__h {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  transform: rotate(var(--r, 0deg));
+  transform-origin: 50% 85%;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 4px 6px rgba(120, 80, 30, 0.12));
+  animation: adorno-sway 6.5s ease-in-out infinite alternate;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes adorno-sway {
+  from { transform: rotate(calc(var(--r, 0deg) - 3deg)) translateY(0); }
+  to   { transform: rotate(calc(var(--r, 0deg) + 3deg)) translateY(-3px); }
+}
+
+.titulo-adornado__texto {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.titulo-adornado__texto .eyebrow { margin-bottom: 0.2rem; }
+.titulo-adornado__texto h2 { margin: 0; }
+
+.titulo-adornado__script {
+  font-family: var(--font-script), var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 8vw, 3.4rem);
+  line-height: 1;
+  color: var(--color-accent-dark);
+}
+
+/* 1) Arco: las hojas forman un arco y el título queda debajo, dentro de él */
+.titulo-adornado--arco { aspect-ratio: 2.2 / 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4%; }
+.titulo-adornado--arco .titulo-adornado__texto { max-width: 70%; }
+
+/* 2) Ramas: dos ramas que suben a los lados, título al centro */
+.titulo-adornado--ramas { aspect-ratio: 2.6 / 1; display: flex; align-items: center; justify-content: center; }
+.titulo-adornado--ramas .titulo-adornado__texto { max-width: 60%; }
+
+/* 3) Corona: anillo de hojas con el título en el centro */
+.titulo-adornado--corona { aspect-ratio: 2 / 1; display: flex; align-items: center; justify-content: center; }
+.titulo-adornado--corona .titulo-adornado__texto { max-width: 62%; }
+
+@media (max-width: 480px) {
+  .titulo-adornado--arco { aspect-ratio: 1.9 / 1; }
+  .titulo-adornado--ramas { aspect-ratio: 2.1 / 1; }
+  .titulo-adornado--ramas .titulo-adornado__texto { max-width: 66%; }
+  .titulo-adornado--corona { aspect-ratio: 1.6 / 1; }
+  .titulo-adornado--corona .titulo-adornado__texto { max-width: 66%; }
+}
+
+@media (prefers-reduced-motion: reduce) { .adorno__h { animation: none; } }
+
+.titulo-adornado--corona { aspect-ratio: 1.75 / 1; margin-bottom: 1.5rem; }
+@media (max-width: 480px) { .titulo-adornado--corona { aspect-ratio: 1.45 / 1; } }
+
+.titulo-adornado--corona { aspect-ratio: 1.6 / 1; margin-bottom: 2rem; }
+@media (max-width: 480px) { .titulo-adornado--corona { aspect-ratio: 1.35 / 1; } }

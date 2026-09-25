@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alondra & Julio — 12 de diciembre 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://esm.sh" crossorigin>
-<link rel="preconnect" href="https://vwwepwgiroxsqxxmdhzm.supabase.co" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=35">
+<link rel="stylesheet" href="css/style.css?v=36">
 </head>
 <body class="cover-active">
 
@@ -284,7 +283,20 @@
 
   <form class="rsvp-form" id="rsvp-form" hidden>
     <p class="rsvp-greeting" id="rsvp-greeting"></p>
-    <div class="rsvp-pases">
+    <div>
+      <label>¿Podrás acompañarnos?</label>
+      <div class="choice-group">
+        <label class="choice">
+          <input type="radio" name="asiste" value="si" checked>
+          <span>Sí, asistiré</span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="asiste" value="no">
+          <span>No podré asistir</span>
+        </label>
+      </div>
+    </div>
+    <div class="rsvp-pases" id="campo-pases">
       <div>
         <label for="pasesAdultos">Pases para adultos</label>
         <select id="pasesAdultos" name="pasesAdultos" required></select>
@@ -294,7 +306,7 @@
         <select id="pasesNinos" name="pasesNinos" required></select>
       </div>
     </div>
-    <div>
+    <div id="campo-nombres">
       <label for="nombresAsistentes">Nombres de los que asistirán</label>
       <textarea id="nombresAsistentes" name="nombresAsistentes" required placeholder="Escribe el nombre completo de cada persona"></textarea>
     </div>
@@ -307,8 +319,8 @@
   </form>
 
   <div class="rsvp-success" id="rsvp-success" hidden>
-    <h2>Te esperamos</h2>
-    <p>¡Gracias por confirmar tu asistencia! Nos hace muy felices contar contigo en este día tan especial.</p>
+    <h2 id="rsvp-success-title">Te esperamos</h2>
+    <p id="rsvp-success-text">¡Gracias por confirmar tu asistencia! Nos hace muy felices contar contigo en este día tan especial.</p>
   </div>
 </section>
 
@@ -320,8 +332,8 @@
 <script src="js/countdown.js"></script>
 <script src="js/cover.js?v=3"></script>
 <script src="js/cover-leaves.js?v=3"></script>
-<script type="module" src="js/cover-invitado.js"></script>
+<script type="module" src="js/cover-invitado.js?v=2"></script>
 <script src="js/reveal.js?v=3"></script>
-<script type="module" src="js/rsvp.js"></script>
+<script type="module" src="js/rsvp.js?v=4"></script>
 </body>
 </html>

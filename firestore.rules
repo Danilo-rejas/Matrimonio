@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para la invitación.
+// Cómo aplicarlas: Firebase Console > Firestore Database > Reglas > pegar > Publicar
+// (o con la CLI: firebase deploy --only firestore:rules)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Solo estas cuentas pueden administrar (misma lista que en
+    // public/js/firebase-config.js). Vale para Google o correo/contraseña.
+    function novios() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() in [
+          'correo-de-alondra@gmail.com',
+          'correo-de-julio@gmail.com'
+        ];
+    }
+
+    // Confirmaciones: cualquiera puede enviar UNA confirmación válida (sin sesión).
+    // Solo los novios pueden verlas, editarlas o borrarlas.
+    match /rsvps/{id} {
+      allow create: if novios() || (
+        request.resource.data.keys().hasOnly(
+          ['cantidadPases', 'pasesAdultos', 'pasesNinos', 'nombresAsistentes', 'mensaje', 'asiste', 'invitadoId', 'creadoEn']
+        )
+        && request.resource.data.cantidadPases is int
+        && request.resource.data.cantidadPases >= 0
+        && request.resource.data.cantidadPases <= 40
+        && request.resource.data.pasesAdultos is int
+        && request.resource.data.pasesAdultos >= 0
+        && request.resource.data.pasesAdultos <= 20
+        && request.resource.data.pasesNinos is int
+        && request.resource.data.pasesNinos >= 0
+        && request.resource.data.pasesNinos <= 20
+        && request.resource.data.nombresAsistentes is string
+        && request.resource.data.nombresAsistentes.size() <= 500
+        && request.resource.data.mensaje is string
+        && request.resource.data.mensaje.size() <= 1000
+        && request.resource.data.asiste is bool
+      );
+      allow read, update, delete: if novios();
+    }
+
+    // Enlaces únicos: un invitado que tiene su token puede LEER solo ese
+    // documento (nombre y pases). Nadie sin sesión puede listar la colección.
+    match /enlaces/{token} {
+      allow get: if true;
+      allow list, write: if novios();
+    }
+
+    // Lista de invitados (teléfonos, notas, mesa): solo los novios.
+    match /invitados/{id} {
+      allow read, write: if novios();
+    }
+
+    // Mesas: solo los novios.
+    match /mesas/{id} {
+      allow read, write: if novios();
+    }
+  }
+}

@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel de confirmaciones — Alondra & Julio</title>
+<title>Panel privado — Alondra & Julio</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=22">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Cormorant+Garamond:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=26">
 </head>
-<body>
+<body class="admin-body">
 
 <div class="admin-login" id="login-view">
   <h2>Panel privado</h2>
@@ -24,6 +24,16 @@
       <input type="password" id="password" name="password" required autocomplete="current-password">
     </div>
     <button type="submit" class="btn">Ingresar</button>
+    <div class="login-divider"><span>o</span></div>
+    <button type="button" class="btn-google" id="google-btn">
+      <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17z"/>
+        <path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.7l7.9-6.1z"/>
+        <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.9l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/>
+      </svg>
+      Entrar con Google
+    </button>
     <p class="form-status" id="login-status"></p>
   </form>
 </div>
@@ -31,31 +41,219 @@
 <div class="admin-shell" id="panel-view" style="display:none;">
   <div class="admin-header">
     <div>
-      <h2>Confirmaciones</h2>
+      <h2>Alondra &amp; Julio</h2>
       <p class="admin-stats" id="stats"></p>
     </div>
     <button class="btn-link" id="logout-btn">Cerrar sesión</button>
   </div>
 
-  <div class="table-wrap">
-    <table class="rsvp-table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Invitado</th>
-          <th>Adultos</th>
-          <th>Niños</th>
-          <th>Asistentes</th>
-          <th>Mensaje</th>
-          <th>Mesa</th>
-        </tr>
-      </thead>
-      <tbody id="rsvp-tbody">
-      </tbody>
-    </table>
-  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab is-active" data-tab="invitados">Invitados</button>
+    <button class="tab" data-tab="asistencia">Asistencia</button>
+    <button class="tab" data-tab="mesas">Mesas</button>
+    <button class="tab" data-tab="respuestas">Respuestas</button>
+  </nav>
+
+  <!-- ================= INVITADOS ================= -->
+  <section class="tab-panel is-active" id="tab-invitados">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3 id="inv-form-title">Agregar invitado</h3>
+        <form class="rsvp-form rsvp-form--compact" id="inv-form">
+          <input type="hidden" id="inv-id">
+          <div>
+            <label for="inv-nombre">Nombre (como aparecerá en la invitación)</label>
+            <input type="text" id="inv-nombre" required placeholder="Ej: Familia Pérez López">
+          </div>
+          <div>
+            <label for="inv-telefono">WhatsApp</label>
+            <input type="tel" id="inv-telefono" placeholder="Ej: 70012345">
+          </div>
+          <div class="field-row field-row--2">
+            <div>
+              <label for="inv-adultos">Pases adultos</label>
+              <input type="number" id="inv-adultos" min="0" max="20" value="2" required>
+            </div>
+            <div>
+              <label for="inv-ninos">Pases niños</label>
+              <input type="number" id="inv-ninos" min="0" max="20" value="0" required>
+            </div>
+          </div>
+          <div>
+            <label for="inv-notas">Notas (solo para ustedes)</label>
+            <input type="text" id="inv-notas" placeholder="Ej: amigos del trabajo">
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn" id="inv-submit">Guardar</button>
+            <button type="button" class="btn-link" id="inv-cancel" style="display:none;">Cancelar</button>
+          </div>
+          <p class="form-status" id="inv-status"></p>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h3>Mensaje de WhatsApp</h3>
+        <p class="hint">Se envía a cada invitado con su enlace. Puedes usar <code>{nombre}</code>, <code>{pases}</code> (ej. "2 adultos y 1 niño") y <code>{enlace}</code>.</p>
+        <textarea id="wa-plantilla" class="wa-plantilla"></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn btn--small" id="wa-guardar">Guardar mensaje</button>
+          <button type="button" class="btn-link" id="wa-restaurar">Restaurar original</button>
+        </div>
+        <p class="hint">Enlace base de la invitación: <span id="base-url" class="mono"></span></p>
+      </div>
+    </div>
+
+    <div class="list-toolbar">
+      <input type="search" id="inv-buscar" placeholder="Buscar invitado…">
+      <select id="inv-filtro">
+        <option value="todos">Todos</option>
+        <option value="confirmo">Confirmaron</option>
+        <option value="no_asiste">No asistirán</option>
+        <option value="sin_respuesta">Sin respuesta</option>
+        <option value="sin_telefono">Sin teléfono</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="rsvp-table">
+        <thead>
+          <tr>
+            <th>Invitado</th>
+            <th>WhatsApp</th>
+            <th>Pases</th>
+            <th>Estado</th>
+            <th>Mesa</th>
+            <th>Enlace</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= ASISTENCIA ================= -->
+  <section class="tab-panel" id="tab-asistencia">
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <div class="admin-grid admin-grid--3">
+      <div class="admin-card admin-card--ok">
+        <h3>Confirmaron <span class="count" id="count-confirmo"></span></h3>
+        <ul class="people-list" id="list-confirmo"></ul>
+      </div>
+      <div class="admin-card admin-card--no">
+        <h3>No asistirán <span class="count" id="count-no"></span></h3>
+        <ul class="people-list" id="list-no"></ul>
+      </div>
+      <div class="admin-card admin-card--pending">
+        <h3>Sin respuesta <span class="count" id="count-pendiente"></span></h3>
+        <ul class="people-list" id="list-pendiente"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MESAS ================= -->
+  <section class="tab-panel" id="tab-mesas">
+    <div class="plano-toolbar">
+      <form class="plano-add" id="mesa-form">
+        <input type="text" id="mesa-nombre" required placeholder="Nombre de la mesa (ej: Mesa 1)">
+        <input type="number" id="mesa-capacidad" min="1" max="30" value="10" required title="Sillas">
+        <select id="mesa-forma" title="Forma">
+          <option value="redonda">Redonda</option>
+          <option value="rect">Rectangular</option>
+        </select>
+        <button type="submit" class="btn btn--small">+ Agregar mesa</button>
+      </form>
+      <p class="admin-stats" id="mesa-resumen"></p>
+    </div>
+    <p class="form-status" id="mesa-status"></p>
+    <p class="hint">Arrastra cada mesa para ubicarla como está en el salón. Arrastra un invitado desde la lista y suéltalo sobre una mesa (o de una mesa a otra). Toca una mesa para editarla.</p>
+
+    <div class="plano-layout">
+      <div class="plano-wrap">
+        <div class="plano" id="plano">
+          <span class="plano__label plano__label--top">Escenario / Novios</span>
+          <span class="plano__label plano__label--bottom">Entrada</span>
+        </div>
+      </div>
+
+      <aside class="plano-side">
+        <div class="admin-card mesa-detalle" id="mesa-detalle" hidden>
+          <div class="mesa-detalle__head">
+            <h3>Mesa seleccionada</h3>
+            <button type="button" class="btn-x" id="detalle-cerrar" title="Cerrar">×</button>
+          </div>
+          <form class="rsvp-form rsvp-form--compact" id="detalle-form">
+            <div>
+              <label for="detalle-nombre">Nombre</label>
+              <input type="text" id="detalle-nombre" required>
+            </div>
+            <div class="field-row field-row--2">
+              <div>
+                <label for="detalle-capacidad">Sillas</label>
+                <input type="number" id="detalle-capacidad" min="1" max="30" required>
+              </div>
+              <div>
+                <label for="detalle-forma">Forma</label>
+                <select id="detalle-forma">
+                  <option value="redonda">Redonda</option>
+                  <option value="rect">Rectangular</option>
+                </select>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn btn--small">Guardar</button>
+              <button type="button" class="btn-link btn-link--danger" id="detalle-eliminar">Eliminar mesa</button>
+            </div>
+          </form>
+          <p class="sub" id="detalle-ocupacion"></p>
+          <ul class="people-list people-list--tight" id="detalle-lista"></ul>
+          <select class="mesa-add" id="detalle-add">
+            <option value="">+ Sentar invitado…</option>
+          </select>
+        </div>
+
+        <div class="admin-card sin-mesa" id="sin-mesa">
+          <h3>Sin mesa <span class="count" id="count-sin-mesa"></span></h3>
+          <input type="search" class="chips-buscar" id="sin-mesa-buscar" placeholder="Buscar…">
+          <div class="chips" id="list-sin-mesa"></div>
+          <p class="hint hint--drop">Suelta aquí un invitado para quitarlo de su mesa.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= RESPUESTAS (formulario) ================= -->
+  <section class="tab-panel" id="tab-respuestas">
+    <p class="hint">Todas las respuestas recibidas por el formulario, incluidas las de personas que entraron sin enlace personal.</p>
+    <details class="admin-card import-box">
+      <summary>Importar respuestas antiguas desde Supabase (CSV)</summary>
+      <p class="hint">En Supabase: Table Editor → tabla <code>rsvps</code> → Export → CSV. Luego elige ese archivo aquí. Se puede repetir sin duplicar.</p>
+      <input type="file" id="csv-file" accept=".csv,text/csv">
+      <p class="form-status" id="csv-status"></p>
+    </details>
+    <div class="table-wrap">
+      <table class="rsvp-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Invitado</th>
+            <th>Asiste</th>
+            <th>Adultos</th>
+            <th>Niños</th>
+            <th>Nombres</th>
+            <th>Mensaje</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rsvp-tbody"></tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
-<script type="module" src="js/admin.js"></script>
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/admin.js?v=5"></script>
 </body>
 </html>

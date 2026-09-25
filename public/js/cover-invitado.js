@@ -1,23 +1,27 @@
-import { supabase } from './supabase-config.js';
+import { db, doc, getDoc } from './firebase-config.js';
 
+// Muestra "Invitación para <nombre> · N pases" en la portada cuando se abre
+// con el enlace personal (?inv=CODIGO).
 async function init() {
   const el = document.getElementById('cover-invitado');
   const nombreEl = document.getElementById('cover-invitado-nombre');
   const pasesEl = document.getElementById('cover-invitado-pases');
   if (!el || !nombreEl || !pasesEl) return;
 
-  const codigo = new URLSearchParams(window.location.search).get('inv');
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('inv') || params.get('i');
   if (!codigo) return;
 
-  const { data: invitado, error } = await supabase
-    .from('invitados')
-    .select('nombre, max_adultos, max_ninos')
-    .eq('codigo', codigo)
-    .single();
+  let invitado = null;
+  try {
+    const snap = await getDoc(doc(db, 'enlaces', codigo));
+    if (snap.exists()) invitado = snap.data();
+  } catch (err) {
+    console.error(err);
+  }
+  if (!invitado) return;
 
-  if (error || !invitado) return;
-
-  const totalPases = invitado.max_adultos + invitado.max_ninos;
+  const totalPases = (Number(invitado.maxAdultos) || 0) + (Number(invitado.maxNinos) || 0);
 
   nombreEl.textContent = invitado.nombre;
   pasesEl.textContent = totalPases === 1 ? '1 pase' : `${totalPases} pases`;

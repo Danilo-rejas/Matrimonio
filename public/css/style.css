@@ -1981,3 +1981,109 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 .btn--outline:hover { background: var(--color-accent-dark); color: #fff; }
 .btn--outline.is-ok { border-color: #4a7a37; color: #4a7a37; background: transparent; }
 .regalos { align-items: start; }
+
+/* =====================================================================
+   Sugerencia de regalo (QR + lluvia de sobres)
+   ===================================================================== */
+.sugerencia {
+  position: relative;
+  max-width: 900px;
+  padding: 4.5rem 1.5rem 4rem;
+  overflow: hidden;
+}
+
+.sugerencia__esquina {
+  position: absolute;
+  width: 190px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.95;
+}
+
+.sugerencia__esquina--tl { top: -10px; left: -10px; }
+.sugerencia__esquina--br { bottom: -10px; right: -10px; transform: scale(-1, -1); }
+
+.sugerencia__titulo {
+  margin: 0 0 2rem;
+  line-height: 0.9;
+  font-weight: 400;
+}
+
+.sugerencia__t1,
+.sugerencia__t2 {
+  display: block;
+  font-family: var(--font-script), var(--font-display);
+  color: var(--color-text);
+}
+
+.sugerencia__t1 { font-size: clamp(3.4rem, 11vw, 5.6rem); }
+.sugerencia__t2 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin-left: 22%; margin-top: -0.1em; }
+
+.sugerencia__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem 2.5rem;
+  align-items: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.sugerencia__qr img {
+  display: block;
+  width: min(100%, 290px);
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+.sugerencia__qr-nota {
+  display: block;
+  margin-top: 0.7rem;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.sugerencia__sobres h3 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-body);
+  font-variant: small-caps;
+  font-weight: 500;
+  font-size: 1.9rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+.sugerencia__icono {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 0.9rem;
+  display: block;
+  color: var(--color-gold-line);
+}
+
+.sugerencia__sobres p {
+  margin: 0;
+  font-family: var(--font-body);
+  font-variant: small-caps;
+  font-size: 1.28rem;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+}
+
+.sugerencia__firma {
+  display: block;
+  width: 48px;
+  margin: 2rem auto 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+  .sugerencia { padding-top: 3.5rem; }
+  .sugerencia__esquina { width: 130px; }
+  .sugerencia__cols { grid-template-columns: 1fr; gap: 2.2rem; }
+  .sugerencia__qr img { width: min(80vw, 260px); }
+  .sugerencia__sobres p { font-size: 1.15rem; }
+}

@@ -2682,3 +2682,16 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 
 .medallon__linea { margin: 0.45rem auto 0.5rem; }
 .medallon .monogram-card__letters { margin-top: 0; }
+
+/* --- Flores de acuarela (recortadas del marco de la portada) --- */
+.adorno__flor {
+  transform-origin: 50% 60%;
+  animation-duration: 8s;
+  filter: drop-shadow(0 6px 10px rgba(120, 80, 30, 0.18));
+}
+.nosotros-foto { width: min(90vw, 460px); }
+.nosotros-foto__anillo { inset: 15%; }
+.nosotros-foto__circulo { inset: 18%; }
+
+.nosotros-foto { margin-bottom: 1.5rem; }
+.nosotros-frase { margin-top: 2.2rem; position: relative; z-index: 4; }

@@ -1184,3 +1184,303 @@ body.cover-active {
 /* Los bloques del formulario de pases usan grid: [hidden] necesita refuerzo */
 .rsvp-pases[hidden],
 #campo-nombres[hidden] { display: none; }
+
+/* =====================================================================
+   Fotos de la pareja: pintura en la portada, banner con parallax,
+   galería "Nuestra historia" y visor a pantalla completa
+   ===================================================================== */
+
+/* --- Pintura en la portada (arco sobre los nombres) --- */
+.cover__painting {
+  position: relative;
+  width: min(62vw, 250px);
+  height: clamp(190px, 33vh, 320px);
+  margin: 0 auto 0.9rem;
+  border-radius: 999px 999px 14px 14px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--color-gold-line),
+    0 18px 40px -18px rgba(74, 58, 42, 0.55);
+  animation: painting-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cover__painting img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+  display: block;
+  transform-origin: 50% 65%;
+  animation: painting-zoom 22s ease-in-out infinite alternate;
+}
+
+/* brillo que recorre el cuadro como luz sobre un lienzo */
+.cover__painting::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 248, 230, 0.35) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: painting-shine 7s ease-in-out 1.5s infinite;
+  pointer-events: none;
+}
+
+/* borde interior cálido, como paspartú */
+.cover__painting::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), inset 0 0 40px rgba(74, 40, 20, 0.35);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes painting-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes painting-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+@keyframes painting-shine {
+  0% { transform: translateX(-120%); }
+  35%, 100% { transform: translateX(120%); }
+}
+
+@media (max-height: 640px) {
+  .cover__painting { height: 150px; width: min(50vw, 180px); margin-bottom: 0.5rem; }
+}
+
+/* --- Banner con la frase sobre la foto del jardín --- */
+.foto-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: min(78vh, 620px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5rem 1.5rem;
+  color: #fff7ea;
+  isolation: isolate;
+}
+
+.foto-banner__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  transform: scale(1.18);
+  will-change: transform;
+  z-index: -2;
+}
+
+.foto-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(56, 34, 18, 0.55) 0%, rgba(56, 34, 18, 0.35) 45%, rgba(56, 34, 18, 0.65) 100%);
+  z-index: -1;
+}
+
+.foto-banner__inner {
+  max-width: 680px;
+  padding: 2.2rem 2rem;
+  border: 1px solid rgba(255, 245, 225, 0.45);
+  outline: 1px solid rgba(255, 245, 225, 0.18);
+  outline-offset: 6px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  background: rgba(56, 34, 18, 0.18);
+}
+
+.foto-banner .eyebrow { color: var(--color-gold); }
+
+.foto-banner .quote {
+  color: #fff7ea;
+  font-size: clamp(1.25rem, 3.2vw, 1.7rem);
+  line-height: 1.5;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+.foto-banner__firma {
+  display: block;
+  margin-top: 1.2rem;
+  font-family: var(--font-script), var(--font-display);
+  font-size: 2rem;
+  color: var(--color-gold);
+}
+
+/* --- Galería "Nuestra historia": fotos como polaroids --- */
+.historia {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.75rem 1.25rem;
+  margin: 2.5rem auto 0;
+  max-width: 900px;
+}
+
+.historia__foto {
+  --giro: -4deg;
+  position: relative;
+  flex: 0 1 240px;
+  margin: 0;
+  padding: 10px 10px 2.6rem;
+  background: #fffdf8;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.12), 0 18px 34px -18px rgba(74, 58, 42, 0.55);
+  transform: rotate(var(--giro));
+  cursor: zoom-in;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+}
+
+.historia__foto:nth-child(2) { --giro: 3deg; margin-top: 1.5rem; }
+.historia__foto:nth-child(3) { --giro: -2deg; }
+
+.historia__foto::after {
+  /* cinta adhesiva */
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 84px;
+  height: 24px;
+  transform: translateX(-50%) rotate(calc(var(--giro) * -1.4));
+  background: rgba(217, 164, 65, 0.35);
+  border: 1px solid rgba(184, 134, 63, 0.35);
+  backdrop-filter: blur(1px);
+}
+
+.historia__foto img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: saturate(1.02) contrast(1.02);
+  transition: transform 0.6s ease;
+}
+
+.historia__foto--ancha img { aspect-ratio: 5 / 4; }
+
+.historia__foto figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.7rem;
+  font-family: var(--font-script), var(--font-display);
+  font-size: 1.35rem;
+  color: var(--color-accent-dark);
+  text-align: center;
+}
+
+.historia__foto:hover,
+.historia__foto:focus-visible {
+  transform: rotate(0deg) translateY(-8px) scale(1.04);
+  box-shadow: 0 2px 4px rgba(74, 58, 42, 0.12), 0 30px 50px -22px rgba(74, 58, 42, 0.6);
+  z-index: 2;
+  outline: none;
+}
+
+.historia__foto:hover img { transform: scale(1.04); }
+
+/* entrada escalonada con un pequeño balanceo, aprovechando .reveal-stagger */
+.reveal-stagger.reveal--visible > .historia__foto {
+  animation: foto-swing 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal-stagger.reveal--visible > .historia__foto:nth-child(2) { animation-delay: 0.15s; }
+.reveal-stagger.reveal--visible > .historia__foto:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes foto-swing {
+  0% { transform: rotate(calc(var(--giro) * 3)) translateY(24px); opacity: 0; }
+  60% { transform: rotate(calc(var(--giro) * 0.6)) translateY(-4px); opacity: 1; }
+  100% { transform: rotate(var(--giro)) translateY(0); opacity: 1; }
+}
+
+@media (max-width: 560px) {
+  .historia { gap: 1.5rem 0.75rem; }
+  .historia__foto { flex: 0 1 46%; padding: 7px 7px 2.2rem; }
+  .historia__foto:nth-child(3) { flex-basis: 62%; }
+  .historia__foto figcaption { font-size: 1.15rem; bottom: 0.5rem; }
+}
+
+/* --- Visor a pantalla completa --- */
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(38, 24, 14, 0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.visor.is-open { opacity: 1; pointer-events: auto; }
+body.visor-abierto { overflow: hidden; }
+
+.visor__fig {
+  margin: 0;
+  max-width: min(92vw, 1100px);
+  max-height: 92vh;
+  text-align: center;
+}
+
+.visor__img {
+  max-width: 92vw;
+  max-height: 82vh;
+  object-fit: contain;
+  border: 6px solid #fffdf8;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.visor__img.is-in { opacity: 1; transform: scale(1); }
+
+.visor__pie {
+  margin-top: 0.8rem;
+  font-family: var(--font-script), var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-gold);
+}
+
+.visor__cerrar,
+.visor__nav {
+  position: absolute;
+  background: rgba(255, 253, 248, 0.12);
+  border: 1px solid rgba(255, 253, 248, 0.35);
+  color: #fffdf8;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  transition: background 0.2s ease;
+}
+
+.visor__cerrar:hover, .visor__nav:hover { background: rgba(255, 253, 248, 0.25); }
+.visor__cerrar { top: 1rem; right: 1rem; font-size: 1.8rem; }
+.visor__nav { top: 50%; transform: translateY(-50%); font-size: 2rem; }
+.visor__nav--prev { left: 0.75rem; }
+.visor__nav--next { right: 0.75rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cover__painting, .cover__painting img, .cover__painting::after,
+  .reveal-stagger.reveal--visible > .historia__foto { animation: none; }
+  .foto-banner__img { transform: none; }
+}

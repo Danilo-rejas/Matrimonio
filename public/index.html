@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=37">
+<link rel="stylesheet" href="css/style.css?v=38">
 </head>
 <body class="cover-active">
 
@@ -20,6 +20,9 @@
   <div class="cover__panel cover__panel--right"></div>
 
   <div class="cover__content">
+    <div class="cover__painting">
+      <img src="img/fotos/pintura-portada.jpg" alt="Alondra y Julio, pintura">
+    </div>
     <img class="cover__flourish-line" src="img/flourish-line.svg" alt="">
 
     <h1 class="cover__names">Alondra</h1>
@@ -78,11 +81,35 @@
   </div>
 </section>
 
-<section class="section reveal">
-  <p class="quote">
-    &ldquo;El amor es el acto más valiente, elegir a alguien no solo para caminar juntos,
-    sino para construir sentido en cada paso, mientras convertimos nuestro amor en promesa de vida.&rdquo;
-  </p>
+<section class="section reveal" id="historia">
+  <p class="eyebrow">Nuestra historia</p>
+  <h2>Momentos que nos trajeron hasta aquí</h2>
+  <div class="historia reveal-stagger">
+    <figure class="historia__foto historia__foto--ancha" data-full="img/fotos/historia-balcon.jpg" data-pie="Donde todo comenzó">
+      <img src="img/fotos/historia-balcon.jpg" alt="Alondra y Julio en el balcón" loading="lazy">
+      <figcaption>Donde todo comenzó</figcaption>
+    </figure>
+    <figure class="historia__foto" data-full="img/fotos/historia-portal.jpg" data-pie="Nuestro refugio">
+      <img src="img/fotos/historia-portal.jpg" alt="Alondra y Julio en el portal" loading="lazy">
+      <figcaption>Nuestro refugio</figcaption>
+    </figure>
+    <figure class="historia__foto historia__foto--ancha" data-full="img/fotos/historia-beso.jpg" data-pie="Para siempre">
+      <img src="img/fotos/historia-beso.jpg" alt="Alondra besa a Julio en la mejilla" loading="lazy">
+      <figcaption>Para siempre</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="foto-banner reveal">
+  <img class="foto-banner__img" src="img/fotos/jardin.jpg" alt="" loading="lazy">
+  <div class="foto-banner__inner">
+    <p class="eyebrow">Nuestra promesa</p>
+    <p class="quote">
+      &ldquo;El amor es el acto más valiente, elegir a alguien no solo para caminar juntos,
+      sino para construir sentido en cada paso, mientras convertimos nuestro amor en promesa de vida.&rdquo;
+    </p>
+    <span class="foto-banner__firma">Alondra &amp; Julio</span>
+  </div>
 </section>
 
 <section class="section section--alt reveal">
@@ -334,6 +361,7 @@
 <script src="js/cover-leaves.js?v=3"></script>
 <script type="module" src="js/cover-invitado.js?v=3"></script>
 <script src="js/reveal.js?v=3"></script>
+<script src="js/fotos.js?v=1"></script>
 <script type="module" src="js/rsvp.js?v=5"></script>
 </body>
 </html>

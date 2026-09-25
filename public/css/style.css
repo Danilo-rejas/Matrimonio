@@ -1669,3 +1669,186 @@ body.visor-abierto { overflow: hidden; }
       linear-gradient(90deg, rgba(251, 246, 236, 0.55) 0%, rgba(251, 246, 236, 0) 38%);
   }
 }
+
+/* =====================================================================
+   Itinerario: línea con medallones dorados
+   ===================================================================== */
+.itin {
+  position: relative;
+  max-width: 440px;
+  margin: 2.5rem auto 0;
+  text-align: left;
+  --itin-x: 30px;   /* centro de los medallones */
+}
+
+.itin::before,
+.itin::after {
+  content: '';
+  position: absolute;
+  left: var(--itin-x);
+  top: 34px;
+  bottom: 34px;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.itin::before { background: var(--color-line); }
+
+.itin::after {
+  background: linear-gradient(180deg, var(--color-gold-line), var(--color-accent-dark));
+  bottom: auto;
+  height: 0;
+  transition: height 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+
+.itin.reveal--visible::after { height: calc(100% - 68px); }
+
+.itin__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 0 1.3rem;
+  align-items: center;
+  padding: 0.85rem 0;
+}
+
+.itin__icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-gold-line);
+  box-shadow: 0 0 0 5px var(--color-bg-alt), 0 0 0 6px rgba(184, 134, 63, 0.35);
+  display: grid;
+  place-items: center;
+  color: var(--color-accent-dark);
+  z-index: 1;
+  transition: transform 0.4s ease, background 0.4s ease;
+}
+
+.section--alt .itin__icon { background: var(--color-bg); }
+
+.itin__icon svg { width: 28px; height: 28px; }
+
+.itin__item:hover .itin__icon { transform: scale(1.06); background: #fff; }
+
+.itin__text { padding: 0.35rem 0; }
+
+.itin__time {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 0.15rem;
+}
+
+.itin__label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.itin__detail {
+  display: block;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--color-muted);
+  margin-top: 0.1rem;
+}
+
+@media (max-width: 420px) {
+  .itin { --itin-x: 26px; }
+  .itin__item { grid-template-columns: 52px 1fr; gap: 0 1rem; }
+  .itin__icon { width: 52px; height: 52px; }
+  .itin__icon svg { width: 24px; height: 24px; }
+  .itin__label { font-size: 1.2rem; }
+}
+
+/* --- Guirnalda con acabado suave (itinerario y regalos) --- */
+.divider--soft {
+  opacity: 1;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  transform-origin: 50% 100%;
+  animation: guirnalda-sway 9s ease-in-out infinite alternate;
+  filter: saturate(1.06) drop-shadow(0 6px 10px rgba(120, 80, 30, 0.12));
+}
+
+@keyframes guirnalda-sway {
+  from { transform: rotate(-0.6deg) translateY(0); }
+  to { transform: rotate(0.6deg) translateY(-4px); }
+}
+
+/* =====================================================================
+   Música de fondo: botón flotante
+   ===================================================================== */
+.music-btn {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  z-index: 900;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 250, 240, 0.6);
+  background: var(--color-accent-dark);
+  color: #fff7ea;
+  box-shadow: 0 0 0 4px rgba(251, 246, 236, 0.85), 0 12px 28px -10px rgba(74, 58, 42, 0.6);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.25s ease, background 0.25s ease, opacity 0.4s ease;
+}
+
+.music-btn:hover { transform: scale(1.06); background: var(--color-accent); }
+
+body.cover-active .music-btn { opacity: 0; pointer-events: none; }
+body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
+
+.music-btn__note { width: 24px; height: 24px; }
+.music-btn__bars { display: none; align-items: flex-end; gap: 3px; height: 20px; }
+.music-btn__bars i {
+  display: block;
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: music-bar 1s ease-in-out infinite alternate;
+}
+.music-btn__bars i:nth-child(2) { animation-delay: 0.2s; }
+.music-btn__bars i:nth-child(3) { animation-delay: 0.4s; }
+.music-btn__bars i:nth-child(4) { animation-delay: 0.1s; }
+
+.music-btn.is-playing .music-btn__note { display: none; }
+.music-btn.is-playing .music-btn__bars { display: flex; }
+
+/* halo suave mientras suena */
+.music-btn.is-playing::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 122, 61, 0.6);
+  animation: music-halo 2.4s ease-out infinite;
+}
+
+@keyframes music-bar {
+  from { height: 6px; }
+  to { height: 20px; }
+}
+
+@keyframes music-halo {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .divider--soft, .music-btn__bars i, .music-btn.is-playing::before { animation: none; }
+}

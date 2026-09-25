@@ -1852,3 +1852,24 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .divider--soft, .music-btn__bars i, .music-btn.is-playing::before { animation: none; }
 }
+
+/* --- Regalos: guirnalda entre el título y la tarjeta; título sin chocar con las esquinas --- */
+.floral-card--regalos { max-width: 460px; padding: 2.5rem 2.75rem; }
+.floral-card--regalos h2 { text-wrap: balance; font-size: clamp(1.7rem, 5.5vw, 2.2rem); line-height: 1.25; }
+.floral-card--regalos .corner-floral--tl { top: -22px; left: -10px; }
+.floral-card--regalos .corner-floral--br { bottom: -22px; right: -10px; }
+
+.divider--regalos {
+  width: min(92vw, 560px);
+  max-width: none;
+  aspect-ratio: 2.1 / 1;
+  margin: 0.25rem auto -2.75rem;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .floral-card--regalos { padding: 2.2rem 1.6rem; }
+  .divider--regalos { margin-bottom: -2rem; }
+}

@@ -2087,3 +2087,14 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
   .sugerencia__qr img { width: min(80vw, 260px); }
   .sugerencia__sobres p { font-size: 1.15rem; }
 }
+
+/* La flor inferior no debe cruzarse con el texto: más aire abajo y esquina más pegada al borde */
+.sugerencia { padding-bottom: 7.5rem; }
+.sugerencia__esquina--br { bottom: -28px; right: -28px; width: 170px; }
+.sugerencia__cols { position: relative; z-index: 1; }
+.sugerencia__firma { margin-top: 1.6rem; }
+
+@media (max-width: 640px) {
+  .sugerencia { padding-bottom: 7rem; }
+  .sugerencia__esquina--br { width: 130px; bottom: -22px; right: -22px; }
+}

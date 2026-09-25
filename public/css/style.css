@@ -1873,3 +1873,111 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
   .floral-card--regalos { padding: 2.2rem 1.6rem; }
   .divider--regalos { margin-bottom: -2rem; }
 }
+
+/* --- Regalos: lluvia de sobres + transferencia por QR --- */
+.regalos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  max-width: 720px;
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.regalo-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  padding: 2rem 1.5rem 1.75rem;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.05), 0 20px 36px -28px rgba(74, 58, 42, 0.45);
+}
+
+.regalo-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(184, 134, 63, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.regalo-card__icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 0.9rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-gold-line);
+  background: var(--color-bg);
+  display: grid;
+  place-items: center;
+  color: var(--color-accent-dark);
+}
+
+.regalo-card__icon svg { width: 30px; height: 30px; }
+
+.regalo-card h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--color-text);
+}
+
+.regalo-card p {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.regalo-qr {
+  width: 190px;
+  margin: 1.1rem auto 0.9rem;
+  padding: 8px;
+  background: #fffdf8;
+  border: 1px solid var(--color-line);
+  box-shadow: inset 0 0 0 1px rgba(184, 134, 63, 0.3);
+}
+
+.regalo-qr img { display: block; width: 100%; height: auto; }
+
+.regalo-datos {
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.regalo-datos div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--color-line);
+}
+
+.regalo-datos dt {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.regalo-datos dd {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-accent-dark);
+  border: 1px solid var(--color-accent-dark);
+}
+
+.btn--outline:hover { background: var(--color-accent-dark); color: #fff; }
+.btn--outline.is-ok { border-color: #4a7a37; color: #4a7a37; background: transparent; }
+.regalos { align-items: start; }

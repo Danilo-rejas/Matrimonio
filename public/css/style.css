@@ -2695,3 +2695,49 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 
 .nosotros-foto { margin-bottom: 1.5rem; }
 .nosotros-frase { margin-top: 2.2rem; position: relative; z-index: 4; }
+
+/* --- Nosotros: dos ramos completos de acuarela --- */
+.ramo-img {
+  position: absolute;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 8px 14px rgba(120, 80, 30, 0.16));
+  animation: ramo-img-sway 8s ease-in-out infinite alternate;
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+}
+.ramo-img--a { left: -12%; bottom: -6%; width: 64%; --ox: 20%; --oy: 100%; }
+.ramo-img--b { right: -10%; top: -6%; width: 62%; --ox: 90%; --oy: 0%; animation-delay: 1.5s; }
+@keyframes ramo-img-sway {
+  from { transform: rotate(-1.2deg); }
+  to { transform: rotate(1.2deg) translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) { .ramo-img { animation: none; } }
+.ramo-img { mix-blend-mode: normal; }
+.ramo-img--a { left: -10%; bottom: -8%; width: 66%; }
+.ramo-img--b { right: -8%; top: 3%; width: 60%; }
+.nosotros-foto { margin-bottom: 2.5rem; }
+
+/* --- Nosotros: ramos de acuarela como esquinas de la sección --- */
+.nosotros { position: relative; overflow: hidden; padding-top: 4.5rem; padding-bottom: 4.5rem; }
+.nosotros > * { position: relative; z-index: 1; }
+.nosotros__esq {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  animation: ramo-img-sway 9s ease-in-out infinite alternate;
+}
+.nosotros__esq--a { left: -1.5%; top: -1%; width: 33%; transform-origin: 0 0; }
+.nosotros__esq--b { right: -1.5%; bottom: -1%; width: 17%; transform-origin: 100% 100%; animation-delay: 2s; }
+.nosotros .nosotros-foto { width: min(78vw, 380px); margin-top: 1.25rem; }
+.nosotros .nosotros-foto__anillo { inset: 4%; }
+.nosotros .nosotros-foto__circulo { inset: 7%; }
+.nosotros .nosotros-frase { margin-top: 1.8rem; }
+@media (max-width: 640px) {
+  .nosotros__esq--a { width: 36%; }
+  .nosotros__esq--b { width: 20%; }
+  .nosotros .nosotros-foto { width: min(72vw, 340px); }
+}
+
+@media (max-width: 640px) {
+  .nosotros .nosotros-frase { max-width: 64%; margin-left: 8%; margin-right: auto; }
+}

@@ -1,4 +1,4 @@
-import { db, doc, getDoc } from './firebase-config.js';
+import { db, doc, getDoc } from './firebase-config.js?v=2';
 
 // Muestra "Invitación para <nombre> · N pases" en la portada cuando se abre
 // con el enlace personal (?inv=CODIGO).

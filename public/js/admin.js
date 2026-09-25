@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider, signInWithPopup,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   onSnapshot, query, orderBy, writeBatch, serverTimestamp, Timestamp
-} from './firebase-config.js';
+} from './firebase-config.js?v=2';
 
 // ---------- Elementos ----------
 const $ = (id) => document.getElementById(id);

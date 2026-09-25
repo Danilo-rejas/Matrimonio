@@ -1529,3 +1529,21 @@ body.visor-abierto { overflow: hidden; }
   .cover__portrait, .cover__portrait img, .hero__photo img { animation: none; }
   .foto-banner__img { transform: none; }
 }
+
+/* --- Ajustes: "Nos casamos" con el texto bajo la foto; "Nosotros" más grande --- */
+.hero { padding-top: 1.5rem; padding-bottom: 3rem; justify-content: flex-start; }
+
+.hero__photo { margin: 0 auto -2.4rem; }
+.hero__photo img { max-height: 66vh; object-position: 50% 45%; }
+
+.hero__text { position: relative; z-index: 1; }
+.hero__text .eyebrow { margin-bottom: 0.2rem; }
+.hero__text .hero__names { margin-top: 0; }
+
+.couple-photo-frame { width: 480px; max-width: 94vw; }
+.couple-photo { width: 62%; height: 62%; }
+
+@media (max-width: 480px) {
+  .hero__photo { margin-bottom: -1.6rem; }
+  .hero__photo img { max-height: 56vh; }
+}

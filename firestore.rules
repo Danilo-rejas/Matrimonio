@@ -13,8 +13,8 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.email != null
         && request.auth.token.email.lower() in [
-          'correo-de-alondra@gmail.com',
-          'correo-de-julio@gmail.com'
+          'guadalupe61297rejas@gmail.com',
+          'aherncesar@gmail.com'
         ];
     }
 

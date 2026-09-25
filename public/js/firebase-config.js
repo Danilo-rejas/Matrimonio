@@ -50,8 +50,8 @@ export const auth = getAuth(app);
 // Cualquier otra cuenta será rechazada. Debe ser la misma lista que está
 // en firestore.rules.
 export const CORREOS_AUTORIZADOS = [
-  'correo-de-alondra@gmail.com',
-  'correo-de-julio@gmail.com'
+  'guadalupe61297rejas@gmail.com',
+  'aherncesar@gmail.com'
 ];
 
 // Se re-exportan las funciones del SDK para que el resto del sitio solo

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=41">
+<link rel="stylesheet" href="css/style.css?v=42">
 </head>
 <body class="cover-active">
 
@@ -50,13 +50,16 @@
 <div class="cover-leaves-layer" id="cover-leaves-layer"></div>
 
 <!-- Contenido de la invitación -->
-<section class="hero reveal">
-  <div class="hero__photo">
-    <img src="img/fotos/hero.jpg" alt="Alondra y Julio">
-  </div>
+<section class="hero hero--foto reveal">
+  <picture class="hero__bg">
+    <source media="(min-width: 700px)" srcset="img/fotos/hero-w.jpg">
+    <img src="img/fotos/hero-m.jpg" alt="Alondra y Julio">
+  </picture>
+  <div class="hero__frame"></div>
   <div class="hero__text">
     <p class="eyebrow">Nos casamos</p>
     <h1 class="hero__names">Alondra<span class="hero__and">&amp;</span>Julio</h1>
+    <img class="hero__line" src="img/flourish-line.svg" alt="">
   </div>
 </section>
 

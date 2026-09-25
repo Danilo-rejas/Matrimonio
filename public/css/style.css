@@ -2181,3 +2181,286 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 }
 
 @media (prefers-reduced-motion: reduce) { .ramo__h { animation: none; } }
+
+/* =====================================================================
+   Pulido de secciones: fecha, padres, celebración, vestimenta,
+   cuenta regresiva y confirmación
+   ===================================================================== */
+
+/* --- Guarda la fecha: "Sábado" ya no pisa el 12 --- */
+.date-showcase { margin-top: 1.6rem; }
+.date-showcase__weekday {
+  top: -1.5rem;
+  transform: translateX(-50%) rotate(-6deg);
+  font-size: 1.9rem;
+}
+.date-showcase__day { margin-top: 0.4rem; }
+
+/* --- Padres: dos columnas con ornamento y nombres en tarjeta --- */
+.parents {
+  align-items: center;
+  gap: 1.5rem 2.5rem;
+  max-width: 720px;
+  margin: 2rem auto 0;
+}
+
+.parents__group {
+  flex: 1 1 220px;
+  padding: 1.4rem 1rem 1.2rem;
+  background: rgba(255, 253, 248, 0.75);
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  position: relative;
+}
+
+.parents__group::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(184, 134, 63, 0.3);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.parents__group h3 {
+  margin: 0 0 0.7rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  position: relative;
+  padding-bottom: 0.6rem;
+}
+
+.parents__group h3::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 34px;
+  height: 1px;
+  background: var(--color-gold-line);
+  transform: translateX(-50%);
+}
+
+.parents__group p {
+  margin: 0.25rem 0;
+  font-size: 1.32rem;
+  color: var(--color-text);
+}
+
+.parents__ornament {
+  width: 60px;
+  opacity: 0.8;
+  flex: 0 0 auto;
+  transform: rotate(90deg);
+}
+
+@media (max-width: 640px) {
+  .parents { gap: 0.75rem; }
+  .parents__ornament { transform: none; width: 90px; }
+}
+
+/* --- Celebración: foto y datos en una sola tarjeta --- */
+.event-cards { gap: 1.75rem; align-items: stretch; }
+
+.event-card-wrap {
+  width: 300px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.05), 0 24px 40px -30px rgba(74, 58, 42, 0.5);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+}
+
+.event-card-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(184, 134, 63, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.event-card-wrap:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 2px 4px rgba(74, 58, 42, 0.06), 0 34px 50px -30px rgba(74, 58, 42, 0.6);
+}
+
+.event-card__photo {
+  max-width: none;
+  margin: 0;
+  border-radius: 5px 5px 0 0;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.event-card {
+  border: none;
+  border-radius: 0 0 5px 5px;
+  padding: 1.5rem 1rem 1.25rem;
+}
+
+.event-card h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-script), var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--color-accent-dark);
+}
+
+.event-card .time {
+  display: inline-block;
+  margin: 0 0 0.7rem;
+  padding: 0.25rem 0.9rem;
+  border: 1px solid var(--color-gold-line);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--color-accent-dark);
+}
+
+.event-card p:not(.time) { font-size: 1.15rem; line-height: 1.4; }
+
+.map-link {
+  margin-top: 1rem;
+  padding: 0.55rem 1.2rem;
+  border: 1px solid var(--color-accent-dark);
+  border-radius: 3px;
+  font-size: 0.78rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.map-link:hover { background: var(--color-accent-dark); color: #fff; border-color: var(--color-accent-dark); }
+
+/* --- Vestimenta: tarjeta con filete y foto integrada --- */
+.note-box {
+  border-radius: 8px;
+  padding: 10px 10px 1.5rem;
+  max-width: 560px;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.05), 0 24px 40px -30px rgba(74, 58, 42, 0.45);
+}
+
+.note-box::before {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(184, 134, 63, 0.3);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.note-box__photo {
+  max-width: none;
+  border-radius: 5px;
+  margin-bottom: 1.25rem;
+}
+
+.note-box p { padding: 0 1.5rem; margin: 0.4rem 0; }
+
+/* --- Cuenta regresiva: medallones --- */
+.cuenta { padding-top: 3.5rem; }
+
+.cuenta__titulo {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-script), var(--font-display);
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.countdown { margin-top: 1.4rem; }
+.countdown__grid { gap: 1rem; flex-wrap: wrap; }
+
+.countdown__unit {
+  min-width: 96px;
+  padding: 1rem 0.6rem 0.8rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.05), 0 18px 30px -26px rgba(74, 58, 42, 0.5);
+}
+
+.countdown__unit::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(184, 134, 63, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.countdown__value { font-size: clamp(2.2rem, 6vw, 2.9rem); color: var(--color-accent-dark); }
+.countdown__label { margin-top: 0.5rem; font-size: 0.66rem; }
+
+.cuenta__pie {
+  margin: 1.4rem 0 0;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.cuenta__bow { display: block; width: 46px; margin: 0.8rem auto 0; opacity: 0.8; }
+
+@media (max-width: 480px) {
+  .countdown__grid { gap: 0.6rem; }
+  .countdown__unit { min-width: 0; flex: 1 1 calc(50% - 0.6rem); max-width: 150px; }
+}
+
+/* --- Confirmación: formulario en tarjeta --- */
+#rsvp .rsvp-form {
+  max-width: 520px;
+  margin: 2rem auto 0;
+  padding: 2rem 1.75rem;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(74, 58, 42, 0.05), 0 24px 40px -30px rgba(74, 58, 42, 0.45);
+}
+
+#rsvp .rsvp-form::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(184, 134, 63, 0.3);
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+#rsvp .rsvp-form[hidden] { display: none; }
+
+#rsvp .rsvp-greeting { font-size: 2rem; line-height: 1.1; margin-bottom: 0.25rem; }
+
+#rsvp .rsvp-form input,
+#rsvp .rsvp-form select,
+#rsvp .rsvp-form textarea {
+  background: var(--color-bg);
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#rsvp .rsvp-form select:focus,
+#rsvp .rsvp-form input:focus,
+#rsvp .rsvp-form textarea:focus {
+  box-shadow: 0 0 0 3px rgba(201, 122, 61, 0.18);
+}
+
+#rsvp .btn { justify-self: center; min-width: 200px; letter-spacing: 0.18em; }
+
+#rsvp .rsvp-invalid {
+  padding: 1.5rem 1.75rem;
+  background: rgba(255, 253, 248, 0.8);
+  border: 1px dashed var(--color-line);
+  border-radius: 6px;
+}
+
+@media (max-width: 480px) {
+  #rsvp .rsvp-form { padding: 1.5rem 1.1rem; }
+}
+
+@media (max-width: 640px) {
+  .parents__group { flex-basis: 100%; }
+  .parents__ornament { flex-basis: 100%; width: auto; max-width: 110px; margin: 0 auto; }
+}

@@ -1484,3 +1484,55 @@ body.visor-abierto { overflow: hidden; }
   .reveal-stagger.reveal--visible > .historia__foto { animation: none; }
   .foto-banner__img { transform: none; }
 }
+
+/* --- Acuarela grande en la pantalla "Nos casamos" --- */
+.hero {
+  padding-top: 3rem;
+  padding-bottom: 1.5rem;
+}
+
+.hero__painting {
+  position: relative;
+  width: min(92vw, 560px);
+  margin: 0.5rem auto -1.5rem;
+  z-index: 0;
+}
+
+.hero__painting img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 58vh;
+  object-fit: cover;
+  object-position: 50% 60%;
+  /* los bordes ya se funden con el fondo en la propia imagen; la máscara
+     suaviza aún más el contorno para que parezca pigmento sobre papel */
+  -webkit-mask-image: radial-gradient(ellipse 70% 66% at 50% 52%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 66% at 50% 52%, #000 55%, transparent 100%);
+  mix-blend-mode: multiply;
+  transform-origin: 50% 60%;
+  animation: hero-paint 26s ease-in-out infinite alternate;
+}
+
+.reveal.hero .hero__painting { opacity: 0; transform: translateY(24px) scale(0.97); transition: opacity 1.4s ease 0.25s, transform 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s; }
+.reveal--visible.hero .hero__painting { opacity: 1; transform: none; }
+
+@keyframes hero-paint {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+.divider--hero {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+}
+
+@media (max-width: 480px) {
+  .hero__painting { margin-bottom: -1rem; }
+  .hero__painting img { max-height: 50vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__painting img { animation: none; }
+}

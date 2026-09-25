@@ -14,7 +14,8 @@ service cloud.firestore {
         && request.auth.token.email != null
         && request.auth.token.email.lower() in [
           'guadalupe61297rejas@gmail.com',
-          'aherncesar@gmail.com'
+          'aherncesar@gmail.com',
+          'admin@gmail.com'
         ];
     }
 

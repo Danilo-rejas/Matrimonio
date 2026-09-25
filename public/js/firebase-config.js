@@ -51,7 +51,8 @@ export const auth = getAuth(app);
 // en firestore.rules.
 export const CORREOS_AUTORIZADOS = [
   'guadalupe61297rejas@gmail.com',
-  'aherncesar@gmail.com'
+  'aherncesar@gmail.com',
+  'admin@gmail.com'
 ];
 
 // Se re-exportan las funciones del SDK para que el resto del sitio solo

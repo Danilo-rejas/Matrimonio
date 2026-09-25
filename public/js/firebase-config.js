@@ -14,7 +14,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  setPersistence,
+  browserLocalPersistence
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import {
   getFirestore,
@@ -45,6 +47,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+// La sesión del panel se guarda en el navegador y sobrevive a recargas y
+// cierres de pestaña, hasta que se pulse "Cerrar sesión".
+setPersistence(auth, browserLocalPersistence).catch((err) => console.error(err));
 
 // Correos que pueden entrar al panel /admin (con Google o con contraseña).
 // Cualquier otra cuenta será rechazada. Debe ser la misma lista que está

@@ -90,7 +90,8 @@ onAuthStateChanged(auth, (user) => {
   }
   if (user) {
     loginView.style.display = 'none';
-    panelView.style.display = 'block';
+    panelView.style.display = 'grid';
+    $('user-email').textContent = user.email || '';
     escuchar();
   } else {
     loginView.style.display = 'block';
@@ -222,7 +223,14 @@ function renderStats() {
   const total = state.invitados.length;
   const confirmados = state.invitados.filter((i) => estadoDe(i) === 'confirmo');
   const personas = confirmados.reduce((s, i) => s + pasesOcupados(i), 0);
-  statsEl.textContent = `${total} invitados · ${confirmados.length} confirmaron (${personas} personas)`;
+  statsEl.innerHTML = `<strong>${total}</strong> invitados · <strong>${confirmados.length}</strong> confirmaron · <strong>${personas}</strong> personas`;
+}
+
+// Iniciales para el avatar: "Familia Pérez López" → "FP"
+function iniciales(nombre) {
+  const partes = String(nombre || '').trim().split(/\s+/).filter(Boolean);
+  const letras = partes.slice(0, 2).map((p) => p[0]);
+  return (letras.join('') || '?').toUpperCase();
 }
 
 // =====================================================================
@@ -235,6 +243,8 @@ $('tabs').addEventListener('click', (e) => {
   document.querySelectorAll('.tab-panel').forEach((p) =>
     p.classList.toggle('is-active', p.id === `tab-${btn.dataset.tab}`)
   );
+  $('page-title').textContent = btn.dataset.titulo || btn.textContent.trim();
+  window.scrollTo({ top: 0 });
 });
 
 // =====================================================================
@@ -384,8 +394,13 @@ function renderInvitados() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <strong>${esc(inv.nombre)}</strong>
-        ${inv.notas ? `<div class="sub">${esc(inv.notas)}</div>` : ''}
+        <div class="guest">
+          <span class="avatar">${esc(iniciales(inv.nombre))}</span>
+          <div>
+            <strong>${esc(inv.nombre)}</strong>
+            ${inv.notas ? `<span class="sub">${esc(inv.notas)}</span>` : ''}
+          </div>
+        </div>
       </td>
       <td>${esc(inv.telefono || '') || '<span class="sub">—</span>'}</td>
       <td>${pasesDe(inv)}<div class="sub">${pasesTxt(inv)}</div>${confirmoDistinto ? `<div class="sub">confirmó ${r.cantidadPases}</div>` : ''}</td>

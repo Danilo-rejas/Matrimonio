@@ -557,13 +557,44 @@ const plano = $('plano');
 let mesaSeleccionada = null;   // id de la mesa abierta en el panel lateral
 let arrastre = null;           // estado del arrastre en curso (mesa o invitado)
 let renderPendiente = false;   // si llegan datos mientras se arrastra, se dibuja al soltar
+let porSentar = null;          // { id, parte } tocado en la lista: el siguiente toque en una mesa lo sienta
+let grupoSinMesa = 'adultos';  // apartado abierto en "Sin mesa": 'adultos' o 'ninos'
 
-// Posición inicial para una mesa nueva (en % del plano), en cuadrícula
-function posicionLibre(indice) {
-  const col = indice % 5;
-  const fila = Math.floor(indice / 5);
-  return { x: 14 + col * 18, y: 22 + (fila % 3) * 26 };
+// El plano es cuadrado y todo lo de adentro se mide en cqw (1% de su ancho),
+// así las mesas y sillas crecen o se achican juntas con el zoom.
+// Casillas de una cuadrícula de 6 x 5 (en % del plano) para las mesas nuevas
+function casilla(i) {
+  const col = i % 6;
+  const fila = Math.floor(i / 6) % 5;
+  const capa = Math.floor(i / 30); // pasadas las 30 mesas, se corren un poco
+  return { x: 10 + col * 16 + capa * 3, y: 14 + fila * 16 + capa * 3 };
 }
+
+// Primera casilla sin una mesa cerca
+function posicionLibre() {
+  for (let i = 0; i < 60; i++) {
+    const p = casilla(i);
+    if (!state.mesas.some((m) => m.x != null && Math.hypot(m.x - p.x, m.y - p.y) < 9)) return p;
+  }
+  return casilla(state.mesas.length);
+}
+
+// ---- Zoom del plano ----
+const ZOOMS = [0.75, 1, 1.25, 1.5, 2];
+let zoom = 1;
+try { zoom = Number(localStorage.getItem('plano_zoom')) || 1; } catch (e) { /* sin almacenamiento */ }
+if (!ZOOMS.includes(zoom)) zoom = 1;
+
+function aplicarZoom() {
+  plano.style.setProperty('--zoom', zoom);
+  $('zoom-valor').textContent = `${Math.round(zoom * 100)}%`;
+  $('zoom-menos').disabled = zoom === ZOOMS[0];
+  $('zoom-mas').disabled = zoom === ZOOMS[ZOOMS.length - 1];
+  try { localStorage.setItem('plano_zoom', zoom); } catch (e) { /* sin almacenamiento */ }
+}
+$('zoom-menos').addEventListener('click', () => { zoom = ZOOMS[Math.max(0, ZOOMS.indexOf(zoom) - 1)]; aplicarZoom(); });
+$('zoom-mas').addEventListener('click', () => { zoom = ZOOMS[Math.min(ZOOMS.length - 1, ZOOMS.indexOf(zoom) + 1)]; aplicarZoom(); });
+aplicarZoom();
 
 $('mesa-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -573,7 +604,7 @@ $('mesa-form').addEventListener('submit', async (e) => {
   const paraNinos = $('mesa-ninos').checked;
   if (!nombre) return;
   const orden = state.mesas.length ? Math.max(...state.mesas.map((m) => m.orden || 0)) + 1 : 1;
-  const pos = posicionLibre(state.mesas.length);
+  const pos = posicionLibre();
   try {
     await addDoc(collection(db, 'mesas'), {
       nombre, capacidad, forma, paraNinos, orden, x: pos.x, y: pos.y, creadoEn: serverTimestamp()
@@ -665,7 +696,32 @@ $('detalle-add').addEventListener('change', (e) => {
   if (id && mesaSeleccionada) asignarMesa(id, mesaSeleccionada, parte);
   e.target.value = '';
 });
+
+// ---- Lista "Sin mesa": apartados, búsqueda y filtro ----
 $('sin-mesa-buscar').addEventListener('input', renderMesas);
+$('sin-mesa-estado').addEventListener('change', renderMesas);
+document.querySelectorAll('.segmento__btn').forEach((b) => b.addEventListener('click', () => {
+  grupoSinMesa = b.dataset.grupo;
+  $('list-sin-mesa').scrollTop = 0;
+  renderMesas();
+}));
+
+// ---- Tocar para sentar (cómodo en el celular, donde arrastrar es difícil) ----
+function elegirParaSentar(id, parte) {
+  porSentar = porSentar && porSentar.id === id && porSentar.parte === parte ? null : { id, parte };
+  if (porSentar && window.matchMedia('(max-width: 760px)').matches) {
+    // En el celular el plano queda arriba de la lista: se sube hasta él
+    plano.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  renderMesas();
+}
+function cancelarSentar() {
+  if (!porSentar) return;
+  porSentar = null;
+  renderMesas();
+}
+$('sentar-cancelar').addEventListener('click', cancelarSentar);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cancelarSentar(); });
 
 function seleccionarMesa(id) {
   mesaSeleccionada = id;
@@ -702,13 +758,76 @@ function cuantos(l) {
   return `${l.n} ${l.n === 1 ? 'persona' : 'personas'}`;
 }
 
-function chipHtml(l, dentroDeMesa) {
+function chipHtml(l) {
   const estado = estadoDe(l.inv);
   const ninos = l.parte === 'ninos';
-  return `<span class="chip chip--${estado === 'confirmo' ? 'ok' : 'pending'}${ninos ? ' chip--ninos' : ''}${dentroDeMesa ? ' chip--mini' : ''}"
+  const elegido = porSentar && porSentar.id === l.inv.id && porSentar.parte === l.parte;
+  return `<span class="chip chip--${estado === 'confirmo' ? 'ok' : 'pending'}${ninos ? ' chip--ninos' : ''}${elegido ? ' chip--elegido' : ''}"
       data-inv="${l.inv.id}" data-parte="${l.parte}" title="${ninos ? 'Niños de ' : ''}${esc(l.inv.nombre)} · ${cuantos(l)} · ${ETIQUETA[estado][0]}">
       ${ninos ? `<span class="chip__ico">${ICONO.nino}</span>` : ''}<span class="chip__nombre">${esc(l.inv.nombre)}</span><span class="chip__n">${l.n}</span>
     </span>`;
+}
+
+// ---- Sillas alrededor de cada mesa ----
+// Posiciones en cqw desde el centro de la mesa; t = tamaño de la silla.
+const MESA_REDONDA = 10;                  // diámetro
+const MESA_RECT = { ancho: 17, alto: 6.5 };
+const SILLA = 2.5;
+const SEPARACION = 0.45;                  // entre la mesa y las sillas
+
+function sillasRedonda(n) {
+  let t = SILLA;
+  let r = MESA_REDONDA / 2 + t / 2 + SEPARACION;
+  const cabe = (2 * Math.PI * r) / n / 1.15; // si son muchas, se achican para no montarse
+  if (cabe < t) { t = cabe; r = MESA_REDONDA / 2 + t / 2 + SEPARACION; }
+  return Array.from({ length: n }, (_, i) => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / n; // desde arriba, en el sentido del reloj
+    return { x: r * Math.cos(a), y: r * Math.sin(a), t };
+  });
+}
+
+function sillasRect(n) {
+  // Arriba de izquierda a derecha y abajo de derecha a izquierda (sentido del
+  // reloj), así una familia queda junta aunque dé la vuelta a la esquina
+  const arriba = Math.ceil(n / 2);
+  const abajo = n - arriba;
+  const paso = MESA_RECT.ancho / arriba;
+  const t = Math.min(SILLA, paso / 1.15);
+  const dy = MESA_RECT.alto / 2 + t / 2 + SEPARACION;
+  const lista = [];
+  for (let i = 0; i < arriba; i++) lista.push({ x: -MESA_RECT.ancho / 2 + paso * (i + 0.5), y: -dy, t });
+  const pasoAbajo = abajo ? MESA_RECT.ancho / abajo : 0;
+  for (let i = abajo - 1; i >= 0; i--) lista.push({ x: -MESA_RECT.ancho / 2 + pasoAbajo * (i + 0.5), y: dy, t });
+  return lista;
+}
+
+function sillasHtml(mesa, gente) {
+  const capacidad = Math.max(1, Number(mesa.capacidad) || 0);
+  const ocupadas = [];
+  gente.forEach((l) => { for (let i = 0; i < l.n; i++) ocupadas.push({ l, primera: i === 0 }); });
+  const total = Math.max(capacidad, ocupadas.length); // las de más se dibujan en rojo
+  const pos = mesa.forma === 'rect' ? sillasRect(total) : sillasRedonda(total);
+  const f = (v) => v.toFixed(2);
+  return pos.map((p, i) => {
+    const estilo = `left:calc(50% + ${f(p.x)}cqw);top:calc(50% + ${f(p.y)}cqw);--t:${f(p.t)}cqw`;
+    const s = ocupadas[i];
+    if (!s) return `<span class="silla" style="${estilo}"></span>`;
+    const { l } = s;
+    const clases = ['silla', 'silla--ocupada'];
+    if (l.parte === 'ninos') clases.push('silla--nino');
+    if (estadoDe(l.inv) !== 'confirmo') clases.push('silla--pend');
+    if (i >= capacidad) clases.push('silla--extra');
+    if (s.primera) clases.push('silla--primera');
+    const titulo = `${l.parte === 'ninos' ? 'Niños de ' : ''}${esc(l.inv.nombre)} · ${cuantos(l)}`;
+    // Las iniciales van en la primera silla de cada invitado
+    return `<span class="${clases.join(' ')}" style="${estilo}" data-inv="${l.inv.id}" data-parte="${l.parte}" title="${titulo}">${s.primera ? esc(iniciales(l.inv.nombre)) : ''}</span>`;
+  }).join('');
+}
+
+// Primera letra sin acento, para agrupar la lista por abecedario
+function letraDe(nombre) {
+  const c = String(nombre || '').trim().charAt(0).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+  return /[A-ZÑ]/.test(c) ? c : '#';
 }
 
 function renderMesas() {
@@ -716,15 +835,18 @@ function renderMesas() {
 
   const todos = lugares();
   const sinMesa = todos.filter((l) => !l.mesaId);
+  if (porSentar && !todos.some((l) => l.inv.id === porSentar.id && l.parte === porSentar.parte)) porSentar = null;
   const totalSillas = state.mesas.reduce((s, m) => s + (Number(m.capacidad) || 0), 0);
   const ocupadas = todos.filter((l) => l.mesaId).reduce((s, l) => s + l.n, 0);
-  const porSentar = sinMesa.reduce((s, l) => s + l.n, 0);
-  const ninosPorSentar = sinMesa.filter((l) => l.parte === 'ninos').reduce((s, l) => s + l.n, 0);
+  const suma = (lista) => lista.reduce((s, l) => s + l.n, 0);
+  const porSentarTotal = suma(sinMesa);
+  const ninosPorSentar = suma(sinMesa.filter((l) => l.parte === 'ninos'));
   $('mesa-resumen').textContent =
-    `${state.mesas.length} mesas · ${ocupadas} / ${totalSillas} sillas · ${porSentar} personas sin mesa`
+    `${state.mesas.length} mesas · ${ocupadas} / ${totalSillas} sillas · ${porSentarTotal} personas sin mesa`
     + (ninosPorSentar ? ` (${ninosPorSentar} ${ninosPorSentar === 1 ? 'niño' : 'niños'})` : '');
 
   // ---- Plano ----
+  plano.classList.toggle('plano--eligiendo', !!porSentar);
   plano.querySelectorAll('.plano-mesa, .plano__vacio').forEach((el) => el.remove());
   if (!state.mesas.length) {
     const vacio = document.createElement('p');
@@ -735,7 +857,7 @@ function renderMesas() {
 
   state.mesas.forEach((mesa, idx) => {
     const { gente, usadas, libres } = ocupacionDe(mesa, todos);
-    const pos = (mesa.x == null || mesa.y == null) ? posicionLibre(idx) : { x: mesa.x, y: mesa.y };
+    const pos = (mesa.x == null || mesa.y == null) ? casilla(idx) : { x: mesa.x, y: mesa.y };
     const el = document.createElement('div');
     el.className = `plano-mesa plano-mesa--${mesa.forma === 'rect' ? 'rect' : 'redonda'}`;
     if (mesa.paraNinos) el.classList.add('plano-mesa--ninos');
@@ -745,31 +867,57 @@ function renderMesas() {
     el.dataset.mesa = mesa.id;
     el.style.left = `${pos.x}%`;
     el.style.top = `${pos.y}%`;
-
-    const max = mesa.forma === 'rect' ? 4 : 3;
-    const visibles = gente.length > max ? gente.slice(0, max - 1) : gente;
-    const resto = gente.length - visibles.length;
     el.innerHTML = `
       <div class="plano-mesa__nombre">${mesa.paraNinos ? ICONO.nino : ''}${esc(mesa.nombre)}</div>
-      <div class="plano-mesa__cupo">${usadas} / ${mesa.capacidad}</div>
-      <div class="plano-mesa__chips">
-        ${visibles.map((l) => chipHtml(l, true)).join('')}
-        ${resto > 0 ? `<span class="chip chip--mini chip--mas">+${resto}</span>` : ''}
-      </div>
+      <div class="plano-mesa__cupo">${usadas}<span>/${mesa.capacidad}</span></div>
+      ${sillasHtml(mesa, gente)}
     `;
     plano.appendChild(el);
   });
 
-  // ---- Lista "Sin mesa": primero los adultos, después los niños ----
-  const q = $('sin-mesa-buscar').value.trim().toLowerCase();
-  const filtrados = sinMesa.filter((l) => !q || l.inv.nombre.toLowerCase().includes(q));
-  const chipsAdultos = filtrados.filter((l) => l.parte === 'adultos').map((l) => chipHtml(l, false)).join('');
-  const chipsNinos = filtrados.filter((l) => l.parte === 'ninos').map((l) => chipHtml(l, false)).join('');
+  // ---- Lista "Sin mesa" ----
+  const q = sinAcentos($('sin-mesa-buscar').value.trim().toLowerCase());
+  const estadoFiltro = $('sin-mesa-estado').value;
+  const visibles = sinMesa
+    .filter((l) => !q || sinAcentos(l.inv.nombre.toLowerCase()).includes(q))
+    .filter((l) => !estadoFiltro || estadoDe(l.inv) === estadoFiltro);
+  const deGrupo = (g) => visibles.filter((l) => l.parte === g);
   $('count-sin-mesa').textContent = sinMesa.length;
-  $('list-sin-mesa').innerHTML = (chipsAdultos && chipsNinos
-    ? `${chipsAdultos}<p class="chips-grupo">${ICONO.nino}Niños</p>${chipsNinos}`
-    : chipsAdultos + chipsNinos)
-    || `<p class="empty">${sinMesa.length ? 'Nadie coincide.' : 'Todos tienen mesa.'}</p>`;
+  $('seg-adultos').textContent = deGrupo('adultos').length;
+  $('seg-ninos').textContent = deGrupo('ninos').length;
+  document.querySelectorAll('.segmento__btn').forEach((b) => {
+    const activo = b.dataset.grupo === grupoSinMesa;
+    b.classList.toggle('is-activo', activo);
+    b.setAttribute('aria-selected', activo);
+  });
+
+  const delGrupo = sinMesa.filter((l) => l.parte === grupoSinMesa);
+  const personas = suma(delGrupo);
+  $('sin-mesa-resumen').textContent = !delGrupo.length ? ''
+    : grupoSinMesa === 'ninos'
+      ? `${personas} ${personas === 1 ? 'niño' : 'niños'} de ${delGrupo.length} ${delGrupo.length === 1 ? 'familia' : 'familias'} por sentar`
+      : `${personas} ${personas === 1 ? 'persona' : 'personas'} de ${delGrupo.length} ${delGrupo.length === 1 ? 'invitación' : 'invitaciones'} por sentar`;
+
+  // Por abecedario, con la letra como separador
+  const lista = deGrupo(grupoSinMesa).sort((a, b) => a.inv.nombre.localeCompare(b.inv.nombre, 'es'));
+  let letra = '';
+  const html = lista.map((l) => {
+    const nueva = letraDe(l.inv.nombre);
+    const separador = nueva !== letra ? `<p class="sin-mesa__letra">${nueva}</p>` : '';
+    letra = nueva;
+    return separador + chipHtml(l);
+  }).join('');
+  const vacio = delGrupo.length
+    ? 'Nadie coincide con la búsqueda.'
+    : grupoSinMesa === 'ninos' ? 'No hay niños por sentar.' : '¡Todos tienen mesa!';
+  $('list-sin-mesa').innerHTML = html || `<p class="empty">${vacio}</p>`;
+
+  // ---- Aviso de "toca la mesa" ----
+  const elegido = porSentar && todos.find((l) => l.inv.id === porSentar.id && l.parte === porSentar.parte);
+  $('sentar-aviso').hidden = !elegido;
+  if (elegido) {
+    $('sentar-texto').innerHTML = `Toca la mesa para <strong>${elegido.parte === 'ninos' ? 'los niños de ' : ''}${esc(elegido.inv.nombre)}</strong> (${cuantos(elegido)})`;
+  }
 
   // ---- Panel de detalle ----
   const detalle = $('mesa-detalle');
@@ -804,8 +952,8 @@ function renderMesas() {
   // Para sentar: en una mesa de niños aparecen primero los niños
   const opcion = (l) => `<option value="${l.inv.id}|${l.parte}">${esc(l.inv.nombre)} (${cuantos(l)})</option>`;
   const grupo = (titulo, parte) => {
-    const lista = sinMesa.filter((l) => l.parte === parte);
-    return lista.length ? `<optgroup label="${titulo}">${lista.map(opcion).join('')}</optgroup>` : '';
+    const deEste = sinMesa.filter((l) => l.parte === parte).sort((a, b) => a.inv.nombre.localeCompare(b.inv.nombre, 'es'));
+    return deEste.length ? `<optgroup label="${titulo}">${deEste.map(opcion).join('')}</optgroup>` : '';
   };
   const grupos = [grupo('Adultos', 'adultos'), grupo('Niños', 'ninos')];
   if (mesa.paraNinos) grupos.reverse();
@@ -813,15 +961,20 @@ function renderMesas() {
 }
 
 // ---- Arrastrar y soltar (funciona con mouse y con el dedo) ----
+// Se arrastran las fichas de la lista, las sillas ocupadas (a otra mesa) y las mesas.
 document.addEventListener('pointerdown', (e) => {
   if (e.button !== undefined && e.button !== 0) return;
-  const chip = e.target.closest('.chip[data-inv]');
+  const ficha = e.target.closest('.chip[data-inv], .silla[data-inv]');
   const mesaEl = e.target.closest('.plano-mesa');
-  if (!chip && !mesaEl) return;
-  if (chip && !chip.closest('#tab-mesas')) return;
+  if (!ficha && !mesaEl) return;
+  if (ficha && !ficha.closest('#tab-mesas')) return;
 
-  if (chip) {
-    arrastre = { tipo: 'invitado', id: chip.dataset.inv, parte: chip.dataset.parte, origen: chip, x0: e.clientX, y0: e.clientY, movido: false, ghost: null };
+  if (ficha) {
+    arrastre = {
+      tipo: 'invitado', id: ficha.dataset.inv, parte: ficha.dataset.parte,
+      enMesa: mesaEl ? mesaEl.dataset.mesa : null,
+      x0: e.clientX, y0: e.clientY, movido: false, ghost: null
+    };
   } else {
     const rect = plano.getBoundingClientRect();
     arrastre = {
@@ -833,6 +986,11 @@ document.addEventListener('pointerdown', (e) => {
   e.preventDefault();
 });
 
+function marcarOrigen(a, si) {
+  document.querySelectorAll(`#tab-mesas [data-inv="${a.id}"][data-parte="${a.parte}"]`)
+    .forEach((el) => el.classList.toggle('is-origen', si));
+}
+
 document.addEventListener('pointermove', (e) => {
   if (!arrastre) return;
   const dx = e.clientX - arrastre.x0;
@@ -843,7 +1001,7 @@ document.addEventListener('pointermove', (e) => {
   if (arrastre.tipo === 'mesa') {
     const { rect } = arrastre;
     arrastre.x = Math.min(96, Math.max(4, ((e.clientX - rect.left) / rect.width) * 100));
-    arrastre.y = Math.min(94, Math.max(6, ((e.clientY - rect.top) / rect.height) * 100));
+    arrastre.y = Math.min(96, Math.max(4, ((e.clientY - rect.top) / rect.height) * 100));
     arrastre.el.style.left = `${arrastre.x}%`;
     arrastre.el.style.top = `${arrastre.y}%`;
     arrastre.el.classList.add('plano-mesa--dragging');
@@ -851,12 +1009,16 @@ document.addEventListener('pointermove', (e) => {
   }
 
   if (!arrastre.ghost) {
-    const ghost = arrastre.origen.cloneNode(true);
+    // Lo que se ve bajo el dedo es la ficha completa, también si se tomó una silla
+    const l = lugares().find((x) => x.inv.id === arrastre.id && x.parte === arrastre.parte);
+    if (!l) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = chipHtml(l);
+    const ghost = tmp.firstElementChild;
     ghost.classList.add('chip--ghost');
-    ghost.classList.remove('chip--mini');
     document.body.appendChild(ghost);
     arrastre.ghost = ghost;
-    arrastre.origen.classList.add('chip--origen');
+    marcarOrigen(arrastre, true);
     document.body.classList.add('is-dragging-chip');
   }
   arrastre.ghost.style.left = `${e.clientX}px`;
@@ -875,6 +1037,7 @@ function destinoEn(x, y) {
   return el.closest('.plano-mesa') || el.closest('#sin-mesa');
 }
 
+// e es null cuando el navegador cancela el gesto (por ejemplo, al desplazar la lista)
 function terminarArrastre(e) {
   if (!arrastre) return;
   const a = arrastre;
@@ -885,14 +1048,30 @@ function terminarArrastre(e) {
   if (a.tipo === 'mesa') {
     a.el.classList.remove('plano-mesa--dragging');
     if (a.movido) moverMesa(a.id, a.x, a.y);
-    else seleccionarMesa(a.id === mesaSeleccionada ? null : a.id);
+    else if (e && porSentar) {
+      // Toque en una mesa con un invitado elegido: se sienta ahí
+      const { id, parte } = porSentar;
+      porSentar = null;
+      asignarMesa(id, a.id, parte);
+      renderPendiente = true;
+    } else if (e) seleccionarMesa(a.id === mesaSeleccionada ? null : a.id);
   } else {
     if (a.ghost) a.ghost.remove();
-    a.origen.classList.remove('chip--origen');
+    marcarOrigen(a, false);
     if (a.movido && e) {
       const destino = destinoEn(e.clientX, e.clientY);
       if (destino && destino.classList.contains('plano-mesa')) asignarMesa(a.id, destino.dataset.mesa, a.parte);
       else if (destino && destino.id === 'sin-mesa') asignarMesa(a.id, null, a.parte);
+    } else if (e && a.enMesa) {
+      // Toque en una silla ocupada: con alguien elegido lo sienta en esa mesa; si no, abre la mesa
+      if (porSentar) {
+        const { id, parte } = porSentar;
+        porSentar = null;
+        asignarMesa(id, a.enMesa, parte);
+        renderPendiente = true;
+      } else seleccionarMesa(a.enMesa);
+    } else if (e) {
+      elegirParaSentar(a.id, a.parte);
     }
   }
 

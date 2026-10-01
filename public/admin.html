@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Cormorant+Garamond:wght@400;500&family=Alex+Brush&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=61">
-<link rel="stylesheet" href="css/admin.css?v=3">
+<link rel="stylesheet" href="css/admin.css?v=4">
 </head>
 <body class="admin-body">
 
@@ -235,13 +235,32 @@
         <p class="admin-stats" id="mesa-resumen"></p>
       </div>
       <p class="form-status" id="mesa-status"></p>
-      <p class="hint">Arrastra cada mesa para ubicarla como está en el salón. Arrastra un invitado desde la lista y suéltalo sobre una mesa (o de una mesa a otra). Los niños de cada familia aparecen aparte, con un globo, para que puedas sentarlos con sus papás o en una mesa de niños. Toca una mesa para editarla.</p>
+      <p class="hint">Arrastra cada mesa para ubicarla como está en el salón. Para sentar a alguien, tócalo en la lista y luego toca su mesa, o arrástralo. Cada silla se pinta con sus iniciales; puedes arrastrar las sillas ocupadas a otra mesa. Los niños de cada familia están en el apartado "Niños", para sentarlos con sus papás o en una mesa de niños. Toca una mesa para editarla.</p>
 
       <div class="plano-layout">
-        <div class="plano-wrap">
-          <div class="plano" id="plano">
-            <span class="plano__label plano__label--top">Escenario / Novios</span>
-            <span class="plano__label plano__label--bottom">Entrada</span>
+        <div class="plano-col">
+          <div class="plano-bar">
+            <div class="plano-leyenda" aria-label="Qué significa cada silla">
+              <span><i class="silla-demo"></i>Confirmó</span>
+              <span><i class="silla-demo silla-demo--pend"></i>Sin respuesta</span>
+              <span><i class="silla-demo silla-demo--nino"></i>Niño</span>
+              <span><i class="silla-demo silla-demo--libre"></i>Libre</span>
+            </div>
+            <div class="plano-zoom" role="group" aria-label="Tamaño del plano">
+              <button type="button" class="btn-icon" id="zoom-menos" title="Alejar" aria-label="Alejar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+              </button>
+              <span class="plano-zoom__valor" id="zoom-valor">100%</span>
+              <button type="button" class="btn-icon" id="zoom-mas" title="Acercar" aria-label="Acercar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="plano-wrap">
+            <div class="plano" id="plano">
+              <span class="plano__label plano__label--top">Escenario / Novios</span>
+              <span class="plano__label plano__label--bottom">Entrada</span>
+            </div>
           </div>
         </div>
 
@@ -288,9 +307,26 @@
 
           <div class="admin-card sin-mesa" id="sin-mesa">
             <h3>Sin mesa <span class="count" id="count-sin-mesa"></span></h3>
-            <input type="search" class="chips-buscar" id="sin-mesa-buscar" placeholder="Buscar…">
-            <div class="chips" id="list-sin-mesa"></div>
-            <p class="hint hint--drop">Suelta aquí un invitado para quitarlo de su mesa.</p>
+            <!-- Dos apartados: los adultos de cada invitación y sus niños -->
+            <div class="segmento" role="tablist">
+              <button type="button" class="segmento__btn is-activo" data-grupo="adultos" role="tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Personas <span class="segmento__n" id="seg-adultos"></span>
+              </button>
+              <button type="button" class="segmento__btn segmento__btn--ninos" data-grupo="ninos" role="tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15.5c3.3 0 6-2.8 6-6.3S15.3 3 12 3 6 5.7 6 9.2s2.7 6.3 6 6.3Z"/><path d="m11 15.5-.6 1.6h3.2l-.6-1.6"/><path d="M12 17.1c0 1.6-1.6 2.2-1 3.9"/></svg>Niños <span class="segmento__n" id="seg-ninos"></span>
+              </button>
+            </div>
+            <div class="sin-mesa__filtros">
+              <input type="search" id="sin-mesa-buscar" placeholder="Buscar…">
+              <select id="sin-mesa-estado" title="Filtrar por respuesta">
+                <option value="">Todos</option>
+                <option value="confirmo">Confirmados</option>
+                <option value="sin_respuesta">Pendientes</option>
+              </select>
+            </div>
+            <p class="sin-mesa__resumen" id="sin-mesa-resumen"></p>
+            <div class="sin-mesa__lista" id="list-sin-mesa"></div>
+            <p class="hint hint--drop">Toca un invitado y luego la mesa (o arrástralo hasta ella). Para quitar a alguien de su mesa, suéltalo aquí.</p>
           </div>
         </aside>
       </div>
@@ -329,8 +365,14 @@
   </main>
 </div>
 
+<!-- Aviso mientras se elige la mesa para el invitado tocado -->
+<div class="sentar-aviso" id="sentar-aviso" hidden>
+  <span id="sentar-texto"></span>
+  <button type="button" class="btn-mini" id="sentar-cancelar">Cancelar</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script type="module" src="js/admin.js?v=11"></script>
+<script type="module" src="js/admin.js?v=12"></script>
 </body>
 </html>

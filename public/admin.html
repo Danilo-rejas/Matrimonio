@@ -133,6 +133,13 @@
         </div>
       </div>
 
+      <details class="admin-card import-box">
+        <summary>Importar lista de invitados desde Excel (CSV)</summary>
+        <p class="hint">En Excel: Archivo → Guardar como → <strong>CSV UTF-8</strong>. Columnas: <code>Invitado</code>, <code>Adultos</code>, <code>Niños</code> y, si las tienen, <code>Teléfono</code> y <code>Notas</code>. Cada invitado recibe su enlace propio. Los nombres que ya están en la lista se saltan, así que se puede repetir sin duplicar.</p>
+        <input type="file" id="inv-csv-file" accept=".csv,text/csv">
+        <p class="form-status" id="inv-csv-status"></p>
+      </details>
+
       <div class="list-toolbar">
         <input type="search" id="inv-buscar" placeholder="Buscar invitado…">
         <select id="inv-filtro">
@@ -285,6 +292,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module" src="js/admin.js?v=8"></script>
+<script type="module" src="js/admin.js?v=9"></script>
 </body>
 </html>

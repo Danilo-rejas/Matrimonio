@@ -897,8 +897,127 @@ $('csv-file').addEventListener('change', async (e) => {
   e.target.value = '';
 });
 
-// CSV sencillo con soporte de comillas y saltos de línea dentro de campos
+// =====================================================================
+// IMPORTAR LISTA DE INVITADOS (Excel guardado como CSV)
+// =====================================================================
+// Columnas: Invitado (o Nombre), Adultos, Niños y, si hay, Teléfono/WhatsApp y Notas.
+// Las demás columnas (ej. "Total personas") se ignoran. Los nombres que ya
+// están en la lista se saltan, así que se puede repetir sin duplicar.
+const COLUMNAS_INV = {
+  nombre: ['invitado', 'invitados', 'nombre'],
+  maxAdultos: ['adultos', 'pasesadultos'],
+  maxNinos: ['ninos', 'pasesninos'],
+  telefono: ['telefono', 'whatsapp', 'celular'],
+  notas: ['notas', 'nota']
+};
+const sinAcentos = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const claveNombre = (n) => sinAcentos(n).replace(/\s+/g, ' ').trim();
+const pasesCsv = (v) => Math.min(20, Math.max(0, Math.floor(Number(v) || 0)));
+
+$('inv-csv-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const estado = $('inv-csv-status');
+  estado.textContent = 'Leyendo archivo...';
+  estado.className = 'form-status';
+
+  try {
+    const filas = parseCsv(await leerTexto(file));
+    if (!filas.length) throw new Error('El archivo está vacío.');
+
+    // Qué columna del archivo corresponde a cada dato
+    const col = {};
+    for (const h of Object.keys(filas[0])) {
+      const k = sinAcentos(h).replace(/[^a-z]/g, '');
+      for (const [campo, nombres] of Object.entries(COLUMNAS_INV)) {
+        if (!col[campo] && nombres.includes(k)) col[campo] = h;
+      }
+    }
+    if (!col.nombre || !col.maxAdultos) {
+      throw new Error('El archivo necesita al menos las columnas "Invitado" y "Adultos".');
+    }
+
+    const existentes = new Set(state.invitados.map((i) => claveNombre(i.nombre)));
+    const codigos = new Set(state.invitados.map((i) => i.codigo));
+    const nuevos = [];
+    const sinPases = [];
+    let repetidos = 0;
+    for (const fila of filas) {
+      const nombre = String(fila[col.nombre] || '').replace(/\s+/g, ' ').trim();
+      if (!nombre || claveNombre(nombre) === 'total') continue; // fila de totales de Excel
+      const datos = {
+        nombre,
+        telefono: col.telefono ? String(fila[col.telefono] || '').trim() : '',
+        maxAdultos: pasesCsv(fila[col.maxAdultos]),
+        maxNinos: col.maxNinos ? pasesCsv(fila[col.maxNinos]) : 0,
+        notas: col.notas ? String(fila[col.notas] || '').trim() : ''
+      };
+      if (datos.maxAdultos + datos.maxNinos === 0) { sinPases.push(nombre); continue; }
+      if (existentes.has(claveNombre(nombre))) { repetidos++; continue; }
+      existentes.add(claveNombre(nombre));
+      nuevos.push(datos);
+    }
+
+    const avisoSinPases = sinPases.length ? ` Sin pases (no se cargaron): ${sinPases.join(', ')}.` : '';
+    if (!nuevos.length) {
+      estado.textContent = `No hay invitados nuevos (${repetidos} ya estaban en la lista).${avisoSinPases}`;
+      return;
+    }
+    const personas = nuevos.reduce((s, d) => s + pasesDe(d), 0);
+    const conTelefono = nuevos.filter((d) => telefonoWa(d.telefono)).length;
+    if (!confirm(`Se agregarán ${nuevos.length} invitados (${personas} personas, ${conTelefono} con teléfono).`
+      + (repetidos ? ` ${repetidos} ya estaban en la lista y se saltan.` : '') + ' ¿Continuar?')) {
+      estado.textContent = 'Importación cancelada.';
+      return;
+    }
+
+    estado.textContent = `Guardando ${nuevos.length} invitados...`;
+    let batch = writeBatch(db);
+    let enBatch = 0;
+    for (const datos of nuevos) {
+      let codigo = nuevoCodigo();
+      while (codigos.has(codigo)) codigo = nuevoCodigo();
+      codigos.add(codigo);
+      const ref = doc(collection(db, 'invitados'));
+      batch.set(ref, { ...datos, codigo, mesaId: null, creadoEn: serverTimestamp() });
+      batch.set(doc(db, 'enlaces', codigo), enlacePublico(ref.id, datos));
+      enBatch += 2;
+      if (enBatch >= 400) {
+        await batch.commit();
+        batch = writeBatch(db);
+        enBatch = 0;
+      }
+    }
+    if (enBatch) await batch.commit();
+
+    estado.textContent = `Listo: ${nuevos.length} invitados agregados con su enlace`
+      + (repetidos ? ` (${repetidos} ya existían).` : '.') + avisoSinPases;
+    estado.className = 'form-status form-status--ok';
+  } catch (err) {
+    console.error(err);
+    estado.textContent = `No se pudo importar: ${err.message}`;
+    estado.className = 'form-status form-status--error';
+  } finally {
+    e.target.value = '';
+  }
+});
+
+// Excel guarda el CSV en UTF-8 o en ANSI (Windows-1252) según la opción
+// elegida: se prueban ambos para no romper tildes ni eñes.
+async function leerTexto(file) {
+  const buf = await file.arrayBuffer();
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(buf);
+  } catch {
+    return new TextDecoder('windows-1252').decode(buf);
+  }
+}
+
+// CSV sencillo con soporte de comillas y saltos de línea dentro de campos.
+// Acepta coma o punto y coma (Excel en español guarda con punto y coma).
 function parseCsv(texto) {
+  const primera = texto.split(/\r?\n/, 1)[0];
+  const sep = primera.split(';').length > primera.split(',').length ? ';' : ',';
   const filas = [];
   let campo = '';
   let fila = [];
@@ -911,7 +1030,7 @@ function parseCsv(texto) {
       else campo += c;
     } else if (c === '"') {
       entreComillas = true;
-    } else if (c === ',') {
+    } else if (c === sep) {
       fila.push(campo); campo = '';
     } else if (c === '\n' || c === '\r') {
       if (c === '\r' && texto[i + 1] === '\n') i++;

@@ -1,4 +1,4 @@
-import { db, collection, doc, getDoc, addDoc, serverTimestamp } from './firebase-config.js?v=2';
+import { db, collection, doc, getDoc, addDoc, serverTimestamp } from './firebase-config.js?v=3';
 
 const form = document.getElementById('rsvp-form');
 const statusEl = document.getElementById('rsvp-status');

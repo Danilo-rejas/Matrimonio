@@ -1,10 +1,10 @@
 import {
-  db, auth, CORREOS_AUTORIZADOS,
+  db, auth, CORREOS_GOOGLE, CORREOS_CONTRASENA,
   onAuthStateChanged, signInWithEmailAndPassword, signOut,
   GoogleAuthProvider, signInWithPopup,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
   onSnapshot, query, orderBy, writeBatch, serverTimestamp, Timestamp
-} from './firebase-config.js?v=2';
+} from './firebase-config.js?v=3';
 
 // ---------- Elementos ----------
 const $ = (id) => document.getElementById(id);
@@ -78,7 +78,10 @@ logoutBtn.addEventListener('click', () => signOut(auth));
 
 function correoAutorizado(user) {
   const correo = (user.email || '').toLowerCase();
-  return CORREOS_AUTORIZADOS.map((c) => c.toLowerCase()).includes(correo);
+  const enLista = (lista) => lista.map((c) => c.toLowerCase()).includes(correo);
+  const conContrasena = user.providerData.some((p) => p.providerId === 'password');
+  return (user.emailVerified && enLista(CORREOS_GOOGLE))
+    || (conContrasena && enLista(CORREOS_CONTRASENA));
 }
 
 onAuthStateChanged(auth, (user) => {

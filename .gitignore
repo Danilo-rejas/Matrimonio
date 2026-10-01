@@ -2,3 +2,4 @@ _antiguo-supabase/
 public/img/_DSC*.png
 .DS_Store
 Thumbs.db
+.firebase/

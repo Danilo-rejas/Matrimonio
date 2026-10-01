@@ -4,7 +4,7 @@
   },
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/_DSC*"],
     "cleanUrls": true,
     "rewrites": [
       { "source": "/admin", "destination": "/admin.html" }

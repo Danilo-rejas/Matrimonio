@@ -52,12 +52,17 @@ export const auth = getAuth(app);
 // cierres de pestaña, hasta que se pulse "Cerrar sesión".
 setPersistence(auth, browserLocalPersistence).catch((err) => console.error(err));
 
-// Correos que pueden entrar al panel /admin (con Google o con contraseña).
-// Cualquier otra cuenta será rechazada. Debe ser la misma lista que está
-// en firestore.rules.
-export const CORREOS_AUTORIZADOS = [
+// Correos que pueden entrar al panel /admin. Cualquier otra cuenta será
+// rechazada. Deben ser las mismas listas que están en firestore.rules.
+//
+// Novios: solo con "Entrar con Google" (Google confirma que el correo es suyo).
+export const CORREOS_GOOGLE = [
   'guadalupe61297rejas@gmail.com',
-  'aherncesar@gmail.com',
+  'aherncesar@gmail.com'
+];
+// Cuenta de apoyo: solo con correo y contraseña, creada en
+// Firebase Console > Authentication > Users.
+export const CORREOS_CONTRASENA = [
   'admin@gmail.com'
 ];
 

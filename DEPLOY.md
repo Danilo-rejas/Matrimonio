@@ -10,10 +10,10 @@ La invitación usa **Firebase** (de Google) para guardar los invitados, las conf
 2. Dentro del proyecto, en el menú **Compilación → Firestore Database → Crear base de datos**. Elige **modo de producción** y la ubicación `southamerica-east1` (São Paulo) o `us-central1`.
 3. En **Compilación → Authentication → Comenzar**. En la pestaña **Sign-in method** activa **Google** (pide un correo de soporte, pon el tuyo) y, si también quieren contraseña, **Correo electrónico/contraseña**.
 4. Decide qué cuentas pueden entrar al panel y escríbelas en DOS lugares (deben ser iguales):
-   - [public/js/firebase-config.js](public/js/firebase-config.js), lista `CORREOS_AUTORIZADOS`.
-   - [firestore.rules](firestore.rules), función `novios()`.
+   - [public/js/firebase-config.js](public/js/firebase-config.js), listas `CORREOS_GOOGLE` y `CORREOS_CONTRASENA`.
+   - [firestore.rules](firestore.rules), función `novios()` (las mismas dos listas).
 
-   Con Google entran directo con esas cuentas de Gmail (botón **Entrar con Google**). Si prefieren contraseña, además créalas en **Authentication → Users → Agregar usuario**. Cualquier otra cuenta que intente entrar es rechazada.
+   Los correos de `CORREOS_GOOGLE` solo entran con el botón **Entrar con Google**: Google confirma que el correo es de esa persona, así nadie puede registrarse con contraseña usando su correo. Los de `CORREOS_CONTRASENA` solo entran con contraseña y **tienen que estar creados** en **Authentication → Users → Agregar usuario** (si no existen, otra persona podría crearlos). Cualquier otra cuenta que intente entrar es rechazada.
 
 ## 2. Conectar el sitio con tu proyecto
 

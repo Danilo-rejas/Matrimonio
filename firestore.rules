@@ -7,16 +7,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Solo estas cuentas pueden administrar (misma lista que en
-    // public/js/firebase-config.js). Vale para Google o correo/contraseña.
+    // Solo estas cuentas pueden administrar (mismas listas que en
+    // public/js/firebase-config.js).
+    // - Novios: con Google, que confirma que el correo es suyo (email_verified).
+    //   Así nadie puede registrarse con contraseña usando su correo.
+    // - Cuenta de apoyo: solo con contraseña (creada en la consola). Si el
+    //   dueño real de ese Gmail entra con Google, no pasa.
     function novios() {
       return request.auth != null
         && request.auth.token.email != null
-        && request.auth.token.email.lower() in [
-          'guadalupe61297rejas@gmail.com',
-          'aherncesar@gmail.com',
-          'admin@gmail.com'
-        ];
+        && (
+          (request.auth.token.email_verified == true
+            && request.auth.token.email.lower() in [
+              'guadalupe61297rejas@gmail.com',
+              'aherncesar@gmail.com'
+            ])
+          || (request.auth.token.firebase.sign_in_provider == 'password'
+            && request.auth.token.email.lower() in [
+              'admin@gmail.com'
+            ])
+        );
     }
 
     // Confirmaciones: cualquiera puede enviar UNA confirmación válida (sin sesión).

@@ -1183,7 +1183,21 @@ body.cover-active {
 
 /* Los bloques del formulario de pases usan grid: [hidden] necesita refuerzo */
 .rsvp-pases[hidden],
+.rsvp-pases > [hidden],
 #campo-nombres[hidden] { display: none; }
+
+/* Un solo campo de pases (sin niños): ocupa todo el ancho */
+.rsvp-pases--uno { grid-template-columns: 1fr; }
+
+/* Cantidad fija (un solo número posible): se ve como dato, sin flecha */
+.rsvp-form select:disabled {
+  background-image: none;
+  padding-right: 0.75rem;
+  cursor: default;
+  opacity: 1;
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
 
 /* =====================================================================
    Fotografías de la pareja
@@ -2436,7 +2450,7 @@ body.visor-abierto .music-btn { opacity: 0; pointer-events: none; }
 #rsvp .rsvp-form input,
 #rsvp .rsvp-form select,
 #rsvp .rsvp-form textarea {
-  background: var(--color-bg);
+  background-color: var(--color-bg);
   border-radius: 4px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

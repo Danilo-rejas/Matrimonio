@@ -24,6 +24,10 @@
   --a-pending-bg: #fbf0d3;
   --a-wa: #22a35e;
   --a-wa-2: #1b8a4f;
+  --a-kid: #8a68b4;       /* lila: niños y mesas de niños */
+  --a-kid-dark: #6b4f91;
+  --a-kid-bg: #f4eefa;
+  --a-kid-line: #d9c9ec;
   --a-radius: 20px;
   --a-radius-sm: 12px;
   --a-shadow: 0 1px 2px rgba(61, 47, 34, 0.04), 0 14px 34px -22px rgba(61, 47, 34, 0.38);
@@ -1021,8 +1025,8 @@ table.rsvp-table {
   margin-bottom: 0.75rem;
 }
 
-.plano-add { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
-.plano-add input[type="text"] { flex: 1 1 240px; min-width: 200px; background-color: var(--a-surface); }
+.plano-add { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; flex: 1 1 100%; }
+.plano-add input[type="text"] { flex: 1 1 200px; min-width: 160px; background-color: var(--a-surface); }
 .plano-add input[type="number"] { width: 84px; background-color: var(--a-surface); }
 .plano-add select { background-color: var(--a-surface); }
 
@@ -1107,6 +1111,9 @@ table.rsvp-table {
 
 .plano-mesa--redonda { width: 140px; height: 140px; border-radius: 50%; }
 .plano-mesa--rect { width: 204px; height: 110px; border-radius: 18px; }
+/* Mesa de niños: lila, con un globo junto al nombre (va antes de full/over/sel para no taparlos) */
+.plano-mesa--ninos { background: #faf6fe; border-color: var(--a-kid-line); }
+.plano-mesa--ninos .plano-mesa__cupo { color: var(--a-kid-dark); }
 .plano-mesa:hover { box-shadow: 0 10px 22px -8px rgba(61, 47, 34, 0.32), inset 0 0 0 6px #fbf6ec; }
 .plano-mesa--dragging { cursor: grabbing; box-shadow: 0 18px 30px -8px rgba(61, 47, 34, 0.38), inset 0 0 0 6px #fbf6ec; z-index: 5; }
 .plano-mesa--sel { border-color: var(--a-brand); box-shadow: 0 0 0 5px rgba(156, 74, 50, 0.16), inset 0 0 0 6px #fbf6ec; z-index: 3; }
@@ -1123,6 +1130,8 @@ table.rsvp-table {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.plano-mesa__nombre svg { width: 13px; height: 13px; margin-right: 3px; vertical-align: -2px; color: var(--a-kid); }
 
 .plano-mesa__cupo { font-family: var(--font-display); font-size: 1.1rem; color: var(--a-brand); line-height: 1; }
 .plano-mesa--full .plano-mesa__cupo { color: var(--a-ok); }
@@ -1174,6 +1183,7 @@ table.rsvp-table {
 .chip--pending .chip__n { background: var(--a-pending); }
 .chip--mini { font-size: 0.64rem; padding: 0.12rem 0.25rem 0.12rem 0.45rem; gap: 0.25rem; max-width: 98px; box-shadow: none; border-width: 1px; }
 .chip--mini:hover { transform: none; }
+.plano-mesa--rect .chip--mini { max-width: 84px; }
 .chip--mini .chip__n { min-width: 1rem; height: 1rem; font-size: 0.58rem; }
 .chip--mas { background: var(--a-surface-2); padding: 0.12rem 0.45rem; cursor: default; }
 .chip--origen { opacity: 0.35; }
@@ -1190,6 +1200,88 @@ body.is-dragging-chip, body.is-dragging-chip * { cursor: grabbing !important; }
 .mesa-detalle__head h3 { margin: 0; }
 .mesa-detalle .sub { margin: 1rem 0 0.25rem; }
 .mesa-detalle .mesa-add { width: 100%; margin-top: 0.7rem; }
+
+/* ---- Niños: casilla "Mesa de niños" y chips de los niños de cada familia ---- */
+.admin-body label.check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: start;
+  margin: 0;
+  padding: 0.62rem 1rem 0.62rem 0.75rem;
+  border: 1.5px solid var(--a-line);
+  border-radius: 999px;
+  background: var(--a-surface);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--a-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.admin-body label.check-pill:hover { border-color: var(--a-kid-line); }
+.admin-body label.check-pill:has(input:checked) { border-color: var(--a-kid); background: var(--a-kid-bg); color: var(--a-kid-dark); }
+.check-pill svg { width: 17px; height: 17px; color: var(--a-kid); }
+
+/* Casilla redonda propia (lila con palomita al marcarla) */
+.admin-body .check-pill input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  margin: 0;
+  border: 1.5px solid var(--a-line-strong);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.admin-body .check-pill input:checked {
+  border-color: var(--a-kid);
+  background: var(--a-kid) url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+
+.admin-body .check-pill input:focus-visible { box-shadow: 0 0 0 3px rgba(138, 104, 180, 0.28); }
+
+.chip__ico {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-left: -0.4rem;
+  border-radius: 50%;
+  background: var(--a-kid-bg);
+  color: var(--a-kid);
+}
+
+.chip__ico svg { width: 0.85rem; height: 0.85rem; }
+.chip--mini .chip__ico { width: 0.9rem; height: 0.9rem; margin-left: -0.25rem; }
+.chip--mini .chip__ico svg { width: 0.62rem; height: 0.62rem; }
+
+.chips-grupo {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.55rem 0 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--a-kid-dark);
+}
+
+.chips-grupo svg { width: 14px; height: 14px; color: var(--a-kid); }
+.chips-grupo::after { content: ""; flex: 1; height: 1px; background: var(--a-kid-line); }
+.ico-nino svg { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; color: var(--a-kid); }
 
 /* =====================================================================
    AVISO FLOTANTE
@@ -1384,6 +1476,9 @@ body.is-dragging-chip, body.is-dragging-chip * { cursor: grabbing !important; }
   .rsvp-table--cards .pases-n { display: none; }
   .rsvp-table--cards .c-pases .sub { display: inline; font-size: 0.8rem; }
   .rsvp-table--cards .c-pases .sub + .sub::before { content: ' · '; }
+  .rsvp-table--cards .c-mesa .sub { display: inline; font-size: 0.8rem; }
+  .rsvp-table--cards .c-mesa .sub + .sub::before,
+  .rsvp-table--cards .c-mesa span:not(.sub):not(.solo-cel) + .sub::before { content: ' · '; }
   .solo-pc { display: none; }
 
   .rsvp-table--cards .avatar { width: 44px; height: 44px; font-size: 0.82rem; }
@@ -1433,6 +1528,7 @@ body.is-dragging-chip, body.is-dragging-chip * { cursor: grabbing !important; }
   .plano-add { width: 100%; }
   .plano-add input[type="text"] { flex: 1 1 100%; min-width: 0; }
   .plano-add select { flex: 1 1 auto; }
+  .admin-body .plano-add label.check-pill { flex: 1 1 auto; justify-content: center; }
   .plano-add .btn { flex: 1 1 100%; }
 }
 

@@ -11,18 +11,42 @@ const greetingEl = document.getElementById('rsvp-greeting');
 const selectAdultos = document.getElementById('pasesAdultos');
 const selectNinos = document.getElementById('pasesNinos');
 const campoPases = document.getElementById('campo-pases');
+const campoAdultos = document.getElementById('campo-adultos');
+const campoNinos = document.getElementById('campo-ninos');
+const labelAdultos = document.getElementById('label-adultos');
 const campoNombres = document.getElementById('campo-nombres');
+const labelNombres = document.getElementById('label-nombres');
 const nombresInput = document.getElementById('nombresAsistentes');
 
-function llenarOpciones(select, max) {
+// Opciones de min a max (marcado max). Si solo hay un número posible,
+// queda fijo: se ve, pero no se puede cambiar.
+function llenarOpciones(select, min, max) {
   select.innerHTML = '';
-  for (let i = 0; i <= max; i++) {
+  for (let i = min; i <= max; i++) {
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = i;
     select.appendChild(opt);
   }
   select.value = max;
+  select.disabled = min >= max;
+}
+
+function prepararPases(invitado) {
+  const maxA = Number(invitado.maxAdultos) || 0;
+  const maxN = Number(invitado.maxNinos) || 0;
+  // Sin pases de niños ese campo no aparece, y el otro se llama solo "Pases"
+  campoAdultos.hidden = maxA === 0;
+  campoNinos.hidden = maxN === 0;
+  campoPases.classList.toggle('rsvp-pases--uno', !maxA || !maxN);
+  labelAdultos.textContent = maxN ? 'Pases para adultos' : (maxA === 1 ? 'Pase' : 'Pases');
+  // Quien confirma que va, va con al menos una persona (un adulto si los hay)
+  llenarOpciones(selectAdultos, maxA ? 1 : 0, maxA);
+  llenarOpciones(selectNinos, maxA ? 0 : Math.min(1, maxN), maxN);
+  if (maxA + maxN === 1) {
+    labelNombres.textContent = 'Nombre de quien asistirá';
+    nombresInput.placeholder = 'Escribe tu nombre completo';
+  }
 }
 
 function asiste() {
@@ -64,8 +88,7 @@ async function init() {
   }
 
   greetingEl.textContent = `Confirmando para: ${invitado.nombre}`;
-  llenarOpciones(selectAdultos, Number(invitado.maxAdultos) || 0);
-  llenarOpciones(selectNinos, Number(invitado.maxNinos) || 0);
+  prepararPases(invitado);
   form.hidden = false;
   form.querySelectorAll('input[name="asiste"]').forEach((r) => r.addEventListener('change', actualizarCampos));
   actualizarCampos();

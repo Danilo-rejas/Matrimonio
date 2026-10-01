@@ -45,7 +45,9 @@ const ICONO = {
   borrar: svg('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>'),
   telefono: svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92Z"/>'),
   personas: svg('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
-  mesa: svg('<circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="3.5" r="1.5"/><circle cx="12" cy="20.5" r="1.5"/><circle cx="3.5" cy="12" r="1.5"/><circle cx="20.5" cy="12" r="1.5"/>')
+  mesa: svg('<circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="3.5" r="1.5"/><circle cx="12" cy="20.5" r="1.5"/><circle cx="3.5" cy="12" r="1.5"/><circle cx="20.5" cy="12" r="1.5"/>'),
+  // Globo: marca a los niños y a las mesas de niños
+  nino: svg('<path d="M12 15.5c3.3 0 6-2.8 6-6.3S15.3 3 12 3 6 5.7 6 9.2s2.7 6.3 6 6.3Z"/><path d="m11 15.5-.6 1.6h3.2l-.6-1.6"/><path d="M12 17.1c0 1.6-1.6 2.2-1 3.9"/>')
 };
 
 // Cuenta regresiva bajo los nombres: "faltan 73 días"
@@ -176,19 +178,38 @@ function pasesDe(inv) {
 }
 
 // "2 adultos y 1 niño"
-function pasesTxt(inv) {
-  const a = Number(inv.maxAdultos) || 0;
-  const n = Number(inv.maxNinos) || 0;
+function personasTxt(a, n) {
   const partes = [];
   if (a) partes.push(`${a} ${a === 1 ? 'adulto' : 'adultos'}`);
   if (n) partes.push(`${n} ${n === 1 ? 'niño' : 'niños'}`);
   return partes.join(' y ') || '0 pases';
 }
 
+function pasesTxt(inv) {
+  return personasTxt(Number(inv.maxAdultos) || 0, Number(inv.maxNinos) || 0);
+}
+
+// Para el mensaje de WhatsApp: "2 pases" o, si hay niños, "3 pases (2 adultos y 1 niño)"
+function pasesMensaje(inv) {
+  const total = pasesDe(inv);
+  const txt = `${total} ${total === 1 ? 'pase' : 'pases'}`;
+  return Number(inv.maxNinos) ? `${txt} (${pasesTxt(inv)})` : txt;
+}
+
 function pasesOcupados(inv) {
   const r = respuestaDe(inv.id);
   if (!r) return pasesDe(inv);
   return r.asiste === false ? 0 : Number(r.cantidadPases) || 0;
+}
+
+// Lo mismo, separado en adultos y niños
+function ocupaDe(inv) {
+  const r = respuestaDe(inv.id);
+  if (!r) return { adultos: Number(inv.maxAdultos) || 0, ninos: Number(inv.maxNinos) || 0 };
+  if (r.asiste === false) return { adultos: 0, ninos: 0 };
+  const ninos = Number(r.pasesNinos) || 0;
+  const adultos = r.pasesAdultos != null ? Number(r.pasesAdultos) || 0 : Math.max(0, (Number(r.cantidadPases) || 0) - ninos);
+  return { adultos, ninos };
 }
 
 function enlaceDe(inv) {
@@ -204,7 +225,7 @@ function telefonoWa(tel) {
 
 function mensajeWa(inv) {
   const plantilla = localStorage.getItem('wa_plantilla') || PLANTILLA_DEFAULT;
-  const pases = pasesTxt(inv);
+  const pases = pasesMensaje(inv);
   return plantilla
     .replaceAll('{nombre}', inv.nombre)
     .replaceAll('{pases}', pases)
@@ -331,7 +352,7 @@ invForm.addEventListener('submit', async (e) => {
     } else {
       const codigo = nuevoCodigo();
       const ref = doc(collection(db, 'invitados'));
-      batch.set(ref, { ...datos, codigo, mesaId: null, creadoEn: serverTimestamp() });
+      batch.set(ref, { ...datos, codigo, mesaId: null, mesaNinosId: null, creadoEn: serverTimestamp() });
       batch.set(doc(db, 'enlaces', codigo), enlacePublico(ref.id, datos));
     }
     await batch.commit();
@@ -425,6 +446,10 @@ function renderInvitados() {
     const estado = estadoDe(inv);
     const r = respuestaDe(inv.id);
     const mesa = state.mesas.find((m) => m.id === inv.mesaId);
+    const mesaNinos = state.mesas.find((m) => m.id === inv.mesaNinosId);
+    // Si los niños se sientan en otra mesa, se indica debajo
+    const ninosAparte = ocupaDe(inv).ninos > 0 && (mesa || mesaNinos) && mesaNinos !== mesa
+      ? `<span class="sub">Niños: ${mesaNinos ? esc(mesaNinos.nombre) : 'sin mesa'}</span>` : '';
     const confirmoDistinto = estado === 'confirmo' && r.cantidadPases !== pasesDe(inv);
     const tr = document.createElement('tr');
     // Las clases c-* ubican cada celda cuando la tabla se ve como tarjetas (celular)
@@ -441,7 +466,7 @@ function renderInvitados() {
       <td class="c-tel ${inv.telefono ? '' : 'is-vacio'}"><span class="solo-cel">${ICONO.telefono}</span>${esc(inv.telefono || '') || '<span class="sub">—</span>'}</td>
       <td class="c-pases"><span class="solo-cel">${ICONO.personas}</span><span class="pases-n">${pasesDe(inv)}</span><span class="sub">${pasesTxt(inv)}</span>${confirmoDistinto ? `<span class="sub">confirmó ${r.cantidadPases}</span>` : ''}</td>
       <td class="c-estado">${badge(estado)}</td>
-      <td class="c-mesa ${mesa ? '' : 'is-vacio'}"><span class="solo-cel">${ICONO.mesa}</span>${mesa ? esc(mesa.nombre) : '<span class="sub">—</span>'}</td>
+      <td class="c-mesa ${mesa || mesaNinos ? '' : 'is-vacio'}"><span class="solo-cel">${ICONO.mesa}</span>${mesa ? `<span>${esc(mesa.nombre)}</span>` : '<span class="sub">—</span>'}${ninosAparte}</td>
       <td class="c-enlace nowrap">
         <button class="btn-mini" data-act="copiar" title="Copiar enlace">${ICONO.enlace}<span>Copiar<span class="solo-pc"> enlace</span></span></button>
         <a class="btn-mini btn-mini--wa" href="${urlWa(inv)}" target="_blank" rel="noopener">${ICONO.whatsapp}<span>WhatsApp</span></a>
@@ -467,6 +492,7 @@ function renderAsistencia() {
 
   const pasesInvitados = state.invitados.reduce((s, i) => s + pasesDe(i), 0);
   const personasConfirmadas = grupos.confirmo.reduce((s, i) => s + pasesOcupados(i), 0);
+  const ninosConfirmados = grupos.confirmo.reduce((s, i) => s + ocupaDe(i).ninos, 0);
   const pasesPendientes = grupos.sin_respuesta.reduce((s, i) => s + pasesDe(i), 0);
   const sinEnlace = state.rsvps
     .filter((r) => !r.invitadoId && r.asiste !== false)
@@ -474,7 +500,8 @@ function renderAsistencia() {
 
   $('stat-grid').innerHTML = [
     stat('Invitados', state.invitados.length, `${pasesInvitados} pases enviados`),
-    stat('Confirmaron', grupos.confirmo.length, `${personasConfirmadas} personas`, 'ok'),
+    stat('Confirmaron', grupos.confirmo.length,
+      `${personasConfirmadas} personas${ninosConfirmados ? ` · ${ninosConfirmados} ${ninosConfirmados === 1 ? 'niño' : 'niños'}` : ''}`, 'ok'),
     stat('No asistirán', grupos.no_asiste.length, '', 'no'),
     stat('Sin respuesta', grupos.sin_respuesta.length, `${pasesPendientes} pases por confirmar`, 'pending'),
     sinEnlace ? stat('Sin enlace', sinEnlace, 'personas que confirmaron sin enlace personal') : ''
@@ -486,11 +513,11 @@ function renderAsistencia() {
 
   $('list-confirmo').innerHTML = grupos.confirmo.map((inv) => {
     const r = respuestaDe(inv.id);
-    const n = r.cantidadPases;
+    const { adultos, ninos } = ocupaDe(inv);
     return `<li>
       <div class="person">
         <strong>${esc(inv.nombre)}</strong>
-        <span class="sub">${n} ${n === 1 ? 'persona' : 'personas'}${r.pasesAdultos != null ? ` (${r.pasesAdultos} adultos, ${r.pasesNinos || 0} niños)` : ''} · ${esc(r.nombresAsistentes || '')}</span>
+        <span class="sub">${ninos ? personasTxt(adultos, ninos) : `${adultos} ${adultos === 1 ? 'persona' : 'personas'}`} · ${esc(r.nombresAsistentes || '')}</span>
         ${r.mensaje ? `<span class="sub quote-mini">“${esc(r.mensaje)}”</span>` : ''}
       </div>
     </li>`;
@@ -543,12 +570,13 @@ $('mesa-form').addEventListener('submit', async (e) => {
   const nombre = $('mesa-nombre').value.trim();
   const capacidad = Number($('mesa-capacidad').value) || 10;
   const forma = $('mesa-forma').value;
+  const paraNinos = $('mesa-ninos').checked;
   if (!nombre) return;
   const orden = state.mesas.length ? Math.max(...state.mesas.map((m) => m.orden || 0)) + 1 : 1;
   const pos = posicionLibre(state.mesas.length);
   try {
     await addDoc(collection(db, 'mesas'), {
-      nombre, capacidad, forma, orden, x: pos.x, y: pos.y, creadoEn: serverTimestamp()
+      nombre, capacidad, forma, paraNinos, orden, x: pos.x, y: pos.y, creadoEn: serverTimestamp()
     });
   } catch (err) {
     console.error(err);
@@ -559,16 +587,20 @@ $('mesa-form').addEventListener('submit', async (e) => {
   $('mesa-status').textContent = '';
   $('mesa-form').reset();
   $('mesa-capacidad').value = 10;
-  toast('Mesa agregada al plano');
+  toast(paraNinos ? 'Mesa de niños agregada al plano' : 'Mesa agregada al plano');
 });
 
-async function asignarMesa(invitadoId, mesaId) {
+// parte: 'adultos' (el invitado y sus acompañantes) o 'ninos' (sus niños, que
+// pueden ir a otra mesa, por ejemplo una mesa de niños)
+async function asignarMesa(invitadoId, mesaId, parte = 'adultos') {
   const inv = state.invitados.find((i) => i.id === invitadoId);
-  if (!inv || (inv.mesaId || null) === (mesaId || null)) return;
+  const campo = parte === 'ninos' ? 'mesaNinosId' : 'mesaId';
+  if (!inv || (inv[campo] || null) === (mesaId || null)) return;
   try {
-    await updateDoc(doc(db, 'invitados', invitadoId), { mesaId: mesaId || null });
+    await updateDoc(doc(db, 'invitados', invitadoId), { [campo]: mesaId || null });
     const mesa = state.mesas.find((m) => m.id === mesaId);
-    toast(mesa ? `${inv.nombre} → ${mesa.nombre}` : `${inv.nombre} sin mesa`);
+    const quien = parte === 'ninos' ? `Niños de ${inv.nombre}` : inv.nombre;
+    toast(mesa ? `${quien} → ${mesa.nombre}` : `${quien}: sin mesa`);
   } catch (err) {
     console.error(err);
     toast('No se pudo asignar');
@@ -585,12 +617,17 @@ async function moverMesa(mesaId, x, y) {
 }
 
 async function eliminarMesa(mesa) {
-  const enMesa = state.invitados.filter((i) => i.mesaId === mesa.id);
+  const enMesa = state.invitados.filter((i) => i.mesaId === mesa.id || i.mesaNinosId === mesa.id);
   const aviso = enMesa.length ? ` Sus ${enMesa.length} invitado(s) quedarán sin mesa.` : '';
   if (!confirm(`¿Eliminar "${mesa.nombre}"?${aviso}`)) return;
   try {
     const batch = writeBatch(db);
-    enMesa.forEach((inv) => batch.update(doc(db, 'invitados', inv.id), { mesaId: null }));
+    enMesa.forEach((inv) => {
+      const cambios = {};
+      if (inv.mesaId === mesa.id) cambios.mesaId = null;
+      if (inv.mesaNinosId === mesa.id) cambios.mesaNinosId = null;
+      batch.update(doc(db, 'invitados', inv.id), cambios);
+    });
     batch.delete(doc(db, 'mesas', mesa.id));
     await batch.commit();
     if (mesaSeleccionada === mesa.id) seleccionarMesa(null);
@@ -614,7 +651,8 @@ $('detalle-form').addEventListener('submit', async (e) => {
     await updateDoc(doc(db, 'mesas', mesaSeleccionada), {
       nombre: $('detalle-nombre').value.trim() || 'Mesa',
       capacidad: Number($('detalle-capacidad').value) || 10,
-      forma: $('detalle-forma').value
+      forma: $('detalle-forma').value,
+      paraNinos: $('detalle-ninos').checked
     });
     toast('Mesa actualizada');
   } catch (err) {
@@ -623,7 +661,8 @@ $('detalle-form').addEventListener('submit', async (e) => {
   }
 });
 $('detalle-add').addEventListener('change', (e) => {
-  if (e.target.value && mesaSeleccionada) asignarMesa(e.target.value, mesaSeleccionada);
+  const [id, parte] = e.target.value.split('|');
+  if (id && mesaSeleccionada) asignarMesa(id, mesaSeleccionada, parte);
   e.target.value = '';
 });
 $('sin-mesa-buscar').addEventListener('input', renderMesas);
@@ -633,36 +672,57 @@ function seleccionarMesa(id) {
   renderMesas();
 }
 
-function sentables() {
-  // Solo se sientan los que no dijeron que no
-  return state.invitados.filter((i) => estadoDe(i) !== 'no_asiste');
+// En el plano cada invitado ocupa hasta dos lugares: sus adultos (mesaId) y sus
+// niños (mesaNinosId), para poder llevar a los niños a una mesa de niños.
+// Los que dijeron que no, no ocupan lugar (ocupaDe les da 0).
+function lugaresDe(inv) {
+  const { adultos, ninos } = ocupaDe(inv);
+  const lista = [];
+  if (adultos) lista.push({ inv, parte: 'adultos', n: adultos, mesaId: inv.mesaId || null });
+  if (ninos) lista.push({ inv, parte: 'ninos', n: ninos, mesaId: inv.mesaNinosId || null });
+  return lista;
 }
 
-function ocupacionDe(mesa) {
-  const gente = sentables().filter((i) => i.mesaId === mesa.id);
-  const usadas = gente.reduce((s, i) => s + pasesOcupados(i), 0);
-  return { gente, usadas, libres: (Number(mesa.capacidad) || 0) - usadas };
+function lugares() {
+  // Si su mesa ya no existe, el lugar vuelve a "Sin mesa"
+  const mesas = new Set(state.mesas.map((m) => m.id));
+  return state.invitados.flatMap(lugaresDe).map((l) => (mesas.has(l.mesaId) ? l : { ...l, mesaId: null }));
 }
 
-function chipHtml(inv, dentroDeMesa) {
-  const n = pasesOcupados(inv);
-  const estado = estadoDe(inv);
-  return `<span class="chip chip--${estado === 'confirmo' ? 'ok' : 'pending'} ${dentroDeMesa ? 'chip--mini' : ''}"
-      data-inv="${inv.id}" title="${esc(inv.nombre)} · ${n} ${n === 1 ? 'persona' : 'personas'} · ${ETIQUETA[estado][0]}">
-      <span class="chip__nombre">${esc(inv.nombre)}</span><span class="chip__n">${n}</span>
+function ocupacionDe(mesa, todos) {
+  const gente = todos.filter((l) => l.mesaId === mesa.id);
+  const usadas = gente.reduce((s, l) => s + l.n, 0);
+  const ninos = gente.filter((l) => l.parte === 'ninos').reduce((s, l) => s + l.n, 0);
+  return { gente, usadas, ninos, libres: (Number(mesa.capacidad) || 0) - usadas };
+}
+
+// "3 niños" / "2 personas"
+function cuantos(l) {
+  if (l.parte === 'ninos') return `${l.n} ${l.n === 1 ? 'niño' : 'niños'}`;
+  return `${l.n} ${l.n === 1 ? 'persona' : 'personas'}`;
+}
+
+function chipHtml(l, dentroDeMesa) {
+  const estado = estadoDe(l.inv);
+  const ninos = l.parte === 'ninos';
+  return `<span class="chip chip--${estado === 'confirmo' ? 'ok' : 'pending'}${ninos ? ' chip--ninos' : ''}${dentroDeMesa ? ' chip--mini' : ''}"
+      data-inv="${l.inv.id}" data-parte="${l.parte}" title="${ninos ? 'Niños de ' : ''}${esc(l.inv.nombre)} · ${cuantos(l)} · ${ETIQUETA[estado][0]}">
+      ${ninos ? `<span class="chip__ico">${ICONO.nino}</span>` : ''}<span class="chip__nombre">${esc(l.inv.nombre)}</span><span class="chip__n">${l.n}</span>
     </span>`;
 }
 
 function renderMesas() {
   if (arrastre) { renderPendiente = true; return; }
 
-  const lista = sentables();
-  const sinMesa = lista.filter((i) => !i.mesaId);
+  const todos = lugares();
+  const sinMesa = todos.filter((l) => !l.mesaId);
   const totalSillas = state.mesas.reduce((s, m) => s + (Number(m.capacidad) || 0), 0);
-  const ocupadas = lista.filter((i) => i.mesaId).reduce((s, i) => s + pasesOcupados(i), 0);
-  const porSentar = sinMesa.reduce((s, i) => s + pasesOcupados(i), 0);
+  const ocupadas = todos.filter((l) => l.mesaId).reduce((s, l) => s + l.n, 0);
+  const porSentar = sinMesa.reduce((s, l) => s + l.n, 0);
+  const ninosPorSentar = sinMesa.filter((l) => l.parte === 'ninos').reduce((s, l) => s + l.n, 0);
   $('mesa-resumen').textContent =
-    `${state.mesas.length} mesas · ${ocupadas} / ${totalSillas} sillas · ${porSentar} personas sin mesa`;
+    `${state.mesas.length} mesas · ${ocupadas} / ${totalSillas} sillas · ${porSentar} personas sin mesa`
+    + (ninosPorSentar ? ` (${ninosPorSentar} ${ninosPorSentar === 1 ? 'niño' : 'niños'})` : '');
 
   // ---- Plano ----
   plano.querySelectorAll('.plano-mesa, .plano__vacio').forEach((el) => el.remove());
@@ -674,10 +734,11 @@ function renderMesas() {
   }
 
   state.mesas.forEach((mesa, idx) => {
-    const { gente, usadas, libres } = ocupacionDe(mesa);
+    const { gente, usadas, libres } = ocupacionDe(mesa, todos);
     const pos = (mesa.x == null || mesa.y == null) ? posicionLibre(idx) : { x: mesa.x, y: mesa.y };
     const el = document.createElement('div');
     el.className = `plano-mesa plano-mesa--${mesa.forma === 'rect' ? 'rect' : 'redonda'}`;
+    if (mesa.paraNinos) el.classList.add('plano-mesa--ninos');
     if (libres < 0) el.classList.add('plano-mesa--over');
     else if (libres === 0) el.classList.add('plano-mesa--full');
     if (mesa.id === mesaSeleccionada) el.classList.add('plano-mesa--sel');
@@ -685,25 +746,29 @@ function renderMesas() {
     el.style.left = `${pos.x}%`;
     el.style.top = `${pos.y}%`;
 
-    const max = mesa.forma === 'rect' ? 6 : 4;
-    const visibles = gente.slice(0, max);
+    const max = mesa.forma === 'rect' ? 4 : 3;
+    const visibles = gente.length > max ? gente.slice(0, max - 1) : gente;
     const resto = gente.length - visibles.length;
     el.innerHTML = `
-      <div class="plano-mesa__nombre">${esc(mesa.nombre)}</div>
+      <div class="plano-mesa__nombre">${mesa.paraNinos ? ICONO.nino : ''}${esc(mesa.nombre)}</div>
       <div class="plano-mesa__cupo">${usadas} / ${mesa.capacidad}</div>
       <div class="plano-mesa__chips">
-        ${visibles.map((inv) => chipHtml(inv, true)).join('')}
+        ${visibles.map((l) => chipHtml(l, true)).join('')}
         ${resto > 0 ? `<span class="chip chip--mini chip--mas">+${resto}</span>` : ''}
       </div>
     `;
     plano.appendChild(el);
   });
 
-  // ---- Lista "Sin mesa" ----
+  // ---- Lista "Sin mesa": primero los adultos, después los niños ----
   const q = $('sin-mesa-buscar').value.trim().toLowerCase();
-  const filtrados = sinMesa.filter((i) => !q || i.nombre.toLowerCase().includes(q));
+  const filtrados = sinMesa.filter((l) => !q || l.inv.nombre.toLowerCase().includes(q));
+  const chipsAdultos = filtrados.filter((l) => l.parte === 'adultos').map((l) => chipHtml(l, false)).join('');
+  const chipsNinos = filtrados.filter((l) => l.parte === 'ninos').map((l) => chipHtml(l, false)).join('');
   $('count-sin-mesa').textContent = sinMesa.length;
-  $('list-sin-mesa').innerHTML = filtrados.map((inv) => chipHtml(inv, false)).join('')
+  $('list-sin-mesa').innerHTML = (chipsAdultos && chipsNinos
+    ? `${chipsAdultos}<p class="chips-grupo">${ICONO.nino}Niños</p>${chipsNinos}`
+    : chipsAdultos + chipsNinos)
     || `<p class="empty">${sinMesa.length ? 'Nadie coincide.' : 'Todos tienen mesa.'}</p>`;
 
   // ---- Panel de detalle ----
@@ -715,25 +780,36 @@ function renderMesas() {
     return;
   }
   detalle.hidden = false;
-  const { gente, usadas, libres } = ocupacionDe(mesa);
+  const { gente, usadas, ninos, libres } = ocupacionDe(mesa, todos);
   if (document.activeElement !== $('detalle-nombre')) $('detalle-nombre').value = mesa.nombre;
   if (document.activeElement !== $('detalle-capacidad')) $('detalle-capacidad').value = mesa.capacidad;
   $('detalle-forma').value = mesa.forma === 'rect' ? 'rect' : 'redonda';
-  $('detalle-ocupacion').textContent = libres < 0
+  $('detalle-ninos').checked = !!mesa.paraNinos;
+  // En una mesa mezclada se aclara cuántos son adultos y cuántos niños
+  const mezcla = ninos && ninos < usadas ? ` · ${personasTxt(usadas - ninos, ninos)}` : '';
+  $('detalle-ocupacion').textContent = (libres < 0
     ? `${usadas} de ${mesa.capacidad} sillas · ¡${-libres} de más!`
-    : `${usadas} de ${mesa.capacidad} sillas · ${libres} libres`;
-  $('detalle-lista').innerHTML = gente.map((inv) => `<li>
+    : `${usadas} de ${mesa.capacidad} sillas · ${libres} libres`) + mezcla;
+  $('detalle-lista').innerHTML = gente.map((l) => `<li>
       <div class="person">
-        <strong>${esc(inv.nombre)}</strong>
-        <span class="sub">${pasesOcupados(inv)} ${pasesOcupados(inv) === 1 ? 'persona' : 'personas'} · ${ETIQUETA[estadoDe(inv)][0]}</span>
+        <strong>${l.parte === 'ninos' ? `<span class="ico-nino">${ICONO.nino}</span>Niños de ` : ''}${esc(l.inv.nombre)}</strong>
+        <span class="sub">${cuantos(l)} · ${ETIQUETA[estadoDe(l.inv)][0]}</span>
       </div>
-      <button type="button" class="btn-x" data-quitar="${inv.id}" title="Quitar de la mesa">×</button>
+      <button type="button" class="btn-x" data-quitar="${l.inv.id}" data-parte="${l.parte}" title="Quitar de la mesa">×</button>
     </li>`).join('') || '<li class="empty">Mesa vacía</li>';
   $('detalle-lista').querySelectorAll('[data-quitar]').forEach((b) =>
-    b.addEventListener('click', () => asignarMesa(b.dataset.quitar, null))
+    b.addEventListener('click', () => asignarMesa(b.dataset.quitar, null, b.dataset.parte))
   );
-  $('detalle-add').innerHTML = '<option value="">+ Sentar invitado…</option>'
-    + sinMesa.map((inv) => `<option value="${inv.id}">${esc(inv.nombre)} (${pasesOcupados(inv)})</option>`).join('');
+
+  // Para sentar: en una mesa de niños aparecen primero los niños
+  const opcion = (l) => `<option value="${l.inv.id}|${l.parte}">${esc(l.inv.nombre)} (${cuantos(l)})</option>`;
+  const grupo = (titulo, parte) => {
+    const lista = sinMesa.filter((l) => l.parte === parte);
+    return lista.length ? `<optgroup label="${titulo}">${lista.map(opcion).join('')}</optgroup>` : '';
+  };
+  const grupos = [grupo('Adultos', 'adultos'), grupo('Niños', 'ninos')];
+  if (mesa.paraNinos) grupos.reverse();
+  $('detalle-add').innerHTML = `<option value="">+ Sentar ${mesa.paraNinos ? 'niños' : 'invitado'}…</option>` + grupos.join('');
 }
 
 // ---- Arrastrar y soltar (funciona con mouse y con el dedo) ----
@@ -745,7 +821,7 @@ document.addEventListener('pointerdown', (e) => {
   if (chip && !chip.closest('#tab-mesas')) return;
 
   if (chip) {
-    arrastre = { tipo: 'invitado', id: chip.dataset.inv, origen: chip, x0: e.clientX, y0: e.clientY, movido: false, ghost: null };
+    arrastre = { tipo: 'invitado', id: chip.dataset.inv, parte: chip.dataset.parte, origen: chip, x0: e.clientX, y0: e.clientY, movido: false, ghost: null };
   } else {
     const rect = plano.getBoundingClientRect();
     arrastre = {
@@ -815,8 +891,8 @@ function terminarArrastre(e) {
     a.origen.classList.remove('chip--origen');
     if (a.movido && e) {
       const destino = destinoEn(e.clientX, e.clientY);
-      if (destino && destino.classList.contains('plano-mesa')) asignarMesa(a.id, destino.dataset.mesa);
-      else if (destino && destino.id === 'sin-mesa') asignarMesa(a.id, null);
+      if (destino && destino.classList.contains('plano-mesa')) asignarMesa(a.id, destino.dataset.mesa, a.parte);
+      else if (destino && destino.id === 'sin-mesa') asignarMesa(a.id, null, a.parte);
     }
   }
 
@@ -1013,7 +1089,7 @@ $('inv-csv-file').addEventListener('change', async (e) => {
       while (codigos.has(codigo)) codigo = nuevoCodigo();
       codigos.add(codigo);
       const ref = doc(collection(db, 'invitados'));
-      batch.set(ref, { ...datos, codigo, mesaId: null, creadoEn: serverTimestamp() });
+      batch.set(ref, { ...datos, codigo, mesaId: null, mesaNinosId: null, creadoEn: serverTimestamp() });
       batch.set(doc(db, 'enlaces', codigo), enlacePublico(ref.id, datos));
       enBatch += 2;
       if (enBatch >= 400) {
@@ -1104,5 +1180,5 @@ function toast(msg) {
 function esc(str) {
   const div = document.createElement('div');
   div.textContent = str ?? '';
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, '&quot;'); // también sirve dentro de atributos
 }

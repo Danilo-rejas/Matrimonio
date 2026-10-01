@@ -2,42 +2,49 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#fffaf3">
 <title>Panel privado — Alondra & Julio</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Cormorant+Garamond:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Cormorant+Garamond:wght@400;500&family=Alex+Brush&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=60">
-<link rel="stylesheet" href="css/admin.css?v=1">
+<link rel="stylesheet" href="css/admin.css?v=2">
 </head>
 <body class="admin-body">
 
 <div class="admin-login" id="login-view">
-  <h2>Panel privado</h2>
-  <p class="eyebrow">Solo para los novios</p>
-  <form class="rsvp-form" id="login-form">
-    <div>
-      <label for="email">Correo</label>
-      <input type="email" id="email" name="email" required autocomplete="username">
-    </div>
-    <div>
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" name="password" required autocomplete="current-password">
-    </div>
-    <button type="submit" class="btn">Ingresar</button>
-    <div class="login-divider"><span>o</span></div>
-    <button type="button" class="btn-google" id="google-btn">
-      <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
-        <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17z"/>
-        <path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.7l7.9-6.1z"/>
-        <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.9l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/>
-      </svg>
-      Entrar con Google
-    </button>
-    <p class="form-status" id="login-status"></p>
-  </form>
+  <!-- Ramos en las esquinas de la pantalla (sus bordes rectos quedan contra el borde) -->
+  <img class="admin-login__flor admin-login__flor--a" src="img/flores/esquina-a.png" alt="">
+  <img class="admin-login__flor admin-login__flor--b" src="img/flores/esquina-a.png" alt="">
+  <div class="admin-login__card">
+    <p class="admin-login__names">Alondra <span>&amp;</span> Julio</p>
+    <p class="admin-login__date">12 · 12 · 2026</p>
+    <h2>Panel de los novios</h2>
+    <form class="rsvp-form" id="login-form">
+      <button type="button" class="btn-google" id="google-btn">
+        <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17z"/>
+          <path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.7l7.9-6.1z"/>
+          <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.9l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/>
+        </svg>
+        Entrar con Google
+      </button>
+      <div class="login-divider"><span>o con correo</span></div>
+      <div>
+        <label for="email">Correo</label>
+        <input type="email" id="email" name="email" required autocomplete="username">
+      </div>
+      <div>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn">Ingresar</button>
+      <p class="form-status" id="login-status"></p>
+    </form>
+  </div>
 </div>
 
 <div class="admin-shell" id="panel-view" style="display:none;">
@@ -45,10 +52,11 @@
   <!-- ================= BARRA LATERAL ================= -->
   <aside class="admin-nav">
     <div class="admin-nav__brand">
-      <div class="admin-nav__monogram">A&amp;J</div>
+      <div class="admin-nav__monogram">A<span>&amp;</span>J</div>
       <div>
         <strong>Alondra &amp; Julio</strong>
-        <span>12 · 12 · 2026</span>
+        <span class="admin-nav__date">12 · 12 · 2026</span>
+        <span class="admin-nav__cuenta" id="cuenta-regresiva"></span>
       </div>
     </div>
 
@@ -73,7 +81,10 @@
 
     <div class="admin-nav__foot">
       <span class="admin-nav__user" id="user-email"></span>
-      <button class="btn-link" id="logout-btn">Cerrar sesión</button>
+      <button class="btn-logout" id="logout-btn" title="Cerrar sesión">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+        <span>Cerrar sesión</span>
+      </button>
     </div>
   </aside>
 
@@ -114,8 +125,11 @@
               <input type="text" id="inv-notas" placeholder="Ej: amigos del trabajo">
             </div>
             <div class="btn-row">
-              <button type="submit" class="btn" id="inv-submit">Guardar</button>
-              <button type="button" class="btn-link" id="inv-cancel" style="display:none;">Cancelar</button>
+              <button type="submit" class="btn" id="inv-submit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Guardar invitado</span>
+              </button>
+              <button type="button" class="btn btn--ghost" id="inv-cancel" style="display:none;">Cancelar</button>
             </div>
             <p class="form-status" id="inv-status"></p>
           </form>
@@ -126,15 +140,24 @@
           <p class="hint">Se envía a cada invitado con su enlace. Puedes usar <code>{nombre}</code>, <code>{pases}</code> (ej. "2 adultos y 1 niño") y <code>{enlace}</code>.</p>
           <textarea id="wa-plantilla" class="wa-plantilla"></textarea>
           <div class="btn-row">
-            <button type="button" class="btn btn--small" id="wa-guardar">Guardar mensaje</button>
-            <button type="button" class="btn-link" id="wa-restaurar">Restaurar original</button>
+            <button type="button" class="btn btn--small" id="wa-guardar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Guardar mensaje
+            </button>
+            <button type="button" class="btn btn--small btn--ghost" id="wa-restaurar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Restaurar original
+            </button>
           </div>
           <p class="hint" style="margin-top:0.9rem;">Enlace base de la invitación: <span id="base-url" class="mono"></span></p>
         </div>
       </div>
 
       <details class="admin-card import-box">
-        <summary>Importar lista de invitados desde Excel (CSV)</summary>
+        <summary>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+          Importar lista de invitados desde Excel (CSV)
+        </summary>
         <p class="hint">En Excel: Archivo → Guardar como → <strong>CSV UTF-8</strong>. Columnas: <code>Invitado</code>, <code>Adultos</code>, <code>Niños</code> y, si las tienen, <code>Teléfono</code> y <code>Notas</code>. Cada invitado recibe su enlace propio. Los nombres que ya están en la lista se saltan, así que se puede repetir sin duplicar.</p>
         <input type="file" id="inv-csv-file" accept=".csv,text/csv">
         <p class="form-status" id="inv-csv-status"></p>
@@ -151,8 +174,8 @@
         </select>
       </div>
 
-      <div class="table-wrap">
-        <table class="rsvp-table">
+      <div class="table-wrap table-wrap--cards">
+        <table class="rsvp-table rsvp-table--cards">
           <thead>
             <tr>
               <th>Invitado</th>
@@ -199,7 +222,10 @@
             <option value="redonda">Redonda</option>
             <option value="rect">Rectangular</option>
           </select>
-          <button type="submit" class="btn btn--small">+ Agregar mesa</button>
+          <button type="submit" class="btn btn--small">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar mesa
+          </button>
         </form>
         <p class="admin-stats" id="mesa-resumen"></p>
       </div>
@@ -240,7 +266,7 @@
               </div>
               <div class="btn-row">
                 <button type="submit" class="btn btn--small">Guardar</button>
-                <button type="button" class="btn-link btn-link--danger" id="detalle-eliminar">Eliminar mesa</button>
+                <button type="button" class="btn btn--small btn--ghost btn--danger" id="detalle-eliminar">Eliminar mesa</button>
               </div>
             </form>
             <p class="sub" id="detalle-ocupacion"></p>
@@ -264,13 +290,16 @@
     <section class="tab-panel" id="tab-respuestas">
       <p class="hint">Todas las respuestas recibidas por el formulario, incluidas las de personas que entraron sin enlace personal.</p>
       <details class="admin-card import-box">
-        <summary>Importar respuestas antiguas desde Supabase (CSV)</summary>
+        <summary>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+          Importar respuestas antiguas desde Supabase (CSV)
+        </summary>
         <p class="hint">En Supabase: Table Editor → tabla <code>rsvps</code> → Export → CSV. Luego elige ese archivo aquí. Se puede repetir sin duplicar.</p>
         <input type="file" id="csv-file" accept=".csv,text/csv">
         <p class="form-status" id="csv-status"></p>
       </details>
-      <div class="table-wrap">
-        <table class="rsvp-table">
+      <div class="table-wrap table-wrap--cards">
+        <table class="rsvp-table rsvp-table--stack">
           <thead>
             <tr>
               <th>Fecha</th>
@@ -292,6 +321,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module" src="js/admin.js?v=9"></script>
+<script type="module" src="js/admin.js?v=10"></script>
 </body>
 </html>

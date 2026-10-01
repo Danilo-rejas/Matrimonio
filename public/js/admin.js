@@ -34,6 +34,31 @@ Hemos reservado {pases} para ti. Esta es tu invitación personal, ahí puedes ve
 Con cariño,
 Alondra & Julio`;
 
+// Iconos de los botones (trazos estilo Lucide; WhatsApp relleno)
+const svg = (d, relleno) => `<svg viewBox="0 0 24 24" aria-hidden="true" ${relleno
+  ? 'fill="currentColor"'
+  : 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"'}>${d}</svg>`;
+const ICONO = {
+  enlace: svg('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'),
+  whatsapp: svg('<path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.41Z"/>', true),
+  editar: svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
+  borrar: svg('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>'),
+  telefono: svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92Z"/>'),
+  personas: svg('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+  mesa: svg('<circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="3.5" r="1.5"/><circle cx="12" cy="20.5" r="1.5"/><circle cx="3.5" cy="12" r="1.5"/><circle cx="20.5" cy="12" r="1.5"/>')
+};
+
+// Cuenta regresiva bajo los nombres: "faltan 73 días"
+(function cuentaRegresiva() {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const dias = Math.round((new Date(2026, 11, 12) - hoy) / 86400000);
+  $('cuenta-regresiva').textContent = dias > 1 ? `faltan ${dias} días`
+    : dias === 1 ? '¡es mañana!'
+      : dias === 0 ? '¡hoy es el gran día!'
+        : '¡recién casados!';
+})();
+
 // =====================================================================
 // LOGIN
 // =====================================================================
@@ -236,6 +261,13 @@ function iniciales(nombre) {
   return (letras.join('') || '?').toUpperCase();
 }
 
+// Color del avatar (1-4), siempre el mismo para el mismo nombre
+function tonoAvatar(nombre) {
+  let h = 0;
+  for (const c of String(nombre || '')) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return (h % 4) + 1;
+}
+
 // =====================================================================
 // PESTAÑAS
 // =====================================================================
@@ -322,7 +354,7 @@ function cancelarEdicion() {
   $('inv-adultos').value = 2;
   $('inv-ninos').value = 0;
   $('inv-form-title').textContent = 'Agregar invitado';
-  $('inv-submit').textContent = 'Guardar';
+  $('inv-submit').querySelector('span').textContent = 'Guardar invitado';
   $('inv-cancel').style.display = 'none';
 }
 
@@ -334,7 +366,7 @@ function editarInvitado(inv) {
   $('inv-ninos').value = inv.maxNinos ?? 0;
   $('inv-notas').value = inv.notas || '';
   $('inv-form-title').textContent = 'Editar invitado';
-  $('inv-submit').textContent = 'Guardar cambios';
+  $('inv-submit').querySelector('span').textContent = 'Guardar cambios';
   $('inv-cancel').style.display = '';
   document.querySelector('.tab[data-tab="invitados"]').click();
   invForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -395,27 +427,28 @@ function renderInvitados() {
     const mesa = state.mesas.find((m) => m.id === inv.mesaId);
     const confirmoDistinto = estado === 'confirmo' && r.cantidadPases !== pasesDe(inv);
     const tr = document.createElement('tr');
+    // Las clases c-* ubican cada celda cuando la tabla se ve como tarjetas (celular)
     tr.innerHTML = `
-      <td>
+      <td class="c-guest">
         <div class="guest">
-          <span class="avatar">${esc(iniciales(inv.nombre))}</span>
+          <span class="avatar avatar--${tonoAvatar(inv.nombre)}">${esc(iniciales(inv.nombre))}</span>
           <div>
             <strong>${esc(inv.nombre)}</strong>
             ${inv.notas ? `<span class="sub">${esc(inv.notas)}</span>` : ''}
           </div>
         </div>
       </td>
-      <td>${esc(inv.telefono || '') || '<span class="sub">—</span>'}</td>
-      <td>${pasesDe(inv)}<div class="sub">${pasesTxt(inv)}</div>${confirmoDistinto ? `<div class="sub">confirmó ${r.cantidadPases}</div>` : ''}</td>
-      <td>${badge(estado)}</td>
-      <td>${mesa ? esc(mesa.nombre) : '<span class="sub">—</span>'}</td>
-      <td class="nowrap">
-        <button class="btn-mini" data-act="copiar" title="Copiar enlace">Copiar enlace</button>
-        <a class="btn-mini btn-mini--wa" href="${urlWa(inv)}" target="_blank" rel="noopener">WhatsApp</a>
+      <td class="c-tel ${inv.telefono ? '' : 'is-vacio'}"><span class="solo-cel">${ICONO.telefono}</span>${esc(inv.telefono || '') || '<span class="sub">—</span>'}</td>
+      <td class="c-pases"><span class="solo-cel">${ICONO.personas}</span><span class="pases-n">${pasesDe(inv)}</span><span class="sub">${pasesTxt(inv)}</span>${confirmoDistinto ? `<span class="sub">confirmó ${r.cantidadPases}</span>` : ''}</td>
+      <td class="c-estado">${badge(estado)}</td>
+      <td class="c-mesa ${mesa ? '' : 'is-vacio'}"><span class="solo-cel">${ICONO.mesa}</span>${mesa ? esc(mesa.nombre) : '<span class="sub">—</span>'}</td>
+      <td class="c-enlace nowrap">
+        <button class="btn-mini" data-act="copiar" title="Copiar enlace">${ICONO.enlace}<span>Copiar<span class="solo-pc"> enlace</span></span></button>
+        <a class="btn-mini btn-mini--wa" href="${urlWa(inv)}" target="_blank" rel="noopener">${ICONO.whatsapp}<span>WhatsApp</span></a>
       </td>
-      <td class="nowrap">
-        <button class="btn-link" data-act="editar">Editar</button>
-        <button class="btn-link btn-link--danger" data-act="eliminar">Eliminar</button>
+      <td class="c-acc nowrap">
+        <button class="btn-icon" data-act="editar" title="Editar" aria-label="Editar a ${esc(inv.nombre)}">${ICONO.editar}</button>
+        <button class="btn-icon btn-icon--danger" data-act="eliminar" title="Eliminar" aria-label="Eliminar a ${esc(inv.nombre)}">${ICONO.borrar}</button>
       </td>
     `;
     tr.querySelector('[data-act="copiar"]').addEventListener('click', () => copiar(enlaceDe(inv)));
@@ -478,7 +511,7 @@ function renderAsistencia() {
         <strong>${esc(inv.nombre)}</strong>
         <span class="sub">${pasesTxt(inv)}</span>
       </div>
-      <a class="btn-mini btn-mini--wa" href="${urlWa(inv)}" target="_blank" rel="noopener" title="Recordar por WhatsApp">Recordar</a>
+      <a class="btn-mini btn-mini--wa" href="${urlWa(inv)}" target="_blank" rel="noopener" title="Recordar por WhatsApp">${ICONO.whatsapp}<span>Recordar</span></a>
     </li>`).join('') || '<li class="empty">¡Todos respondieron!</li>';
 }
 
@@ -811,15 +844,16 @@ function renderRespuestas() {
     const f = fechaDe(row.creadoEn);
     const fecha = f ? f.toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' }) : '—';
     const tr = document.createElement('tr');
+    // data-label: título de cada dato cuando la tabla se apila en el celular
     tr.innerHTML = `
-      <td class="nowrap">${fecha}</td>
-      <td>${inv ? esc(inv.nombre) : '<span class="sub">sin enlace</span>'}</td>
-      <td>${row.asiste === false ? badge('no_asiste') : badge('confirmo')}</td>
-      <td>${row.pasesAdultos ?? row.cantidadPases ?? ''}</td>
-      <td>${row.pasesNinos ?? 0}</td>
-      <td>${esc(row.nombresAsistentes || '')}</td>
-      <td>${esc(row.mensaje || '')}</td>
-      <td><button class="btn-link btn-link--danger">Borrar</button></td>
+      <td class="nowrap" data-label="Fecha">${fecha}</td>
+      <td data-label="Invitado"><strong>${inv ? esc(inv.nombre) : '<span class="sub">sin enlace</span>'}</strong></td>
+      <td data-label="Asiste">${row.asiste === false ? badge('no_asiste') : badge('confirmo')}</td>
+      <td data-label="Adultos">${row.pasesAdultos ?? row.cantidadPases ?? ''}</td>
+      <td data-label="Niños">${row.pasesNinos ?? 0}</td>
+      <td data-label="Nombres" class="${row.nombresAsistentes ? '' : 'is-vacio'}">${esc(row.nombresAsistentes || '')}</td>
+      <td data-label="Mensaje" class="${row.mensaje ? '' : 'is-vacio'}">${row.mensaje ? `<span class="quote-mini">“${esc(row.mensaje)}”</span>` : ''}</td>
+      <td class="c-acc"><button class="btn-icon btn-icon--danger" title="Borrar respuesta" aria-label="Borrar respuesta">${ICONO.borrar}</button></td>
     `;
     tr.querySelector('button').addEventListener('click', async () => {
       if (!confirm('¿Borrar esta respuesta?')) return;

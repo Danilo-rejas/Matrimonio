@@ -15,8 +15,11 @@ const campoAdultos = document.getElementById('campo-adultos');
 const campoNinos = document.getElementById('campo-ninos');
 const labelAdultos = document.getElementById('label-adultos');
 const campoNombres = document.getElementById('campo-nombres');
-const labelNombres = document.getElementById('label-nombres');
 const nombresInput = document.getElementById('nombresAsistentes');
+
+// Invitación para una sola persona: no hay pases que elegir ni nombres que
+// escribir; solo dice si va o no, y la respuesta se guarda con su nombre.
+let individual = false;
 
 // Opciones de min a max (marcado max). Si solo hay un número posible,
 // queda fijo: se ve, pero no se puede cambiar.
@@ -43,10 +46,7 @@ function prepararPases(invitado) {
   // Quien confirma que va, va con al menos una persona (un adulto si los hay)
   llenarOpciones(selectAdultos, maxA ? 1 : 0, maxA);
   llenarOpciones(selectNinos, maxA ? 0 : Math.min(1, maxN), maxN);
-  if (maxA + maxN === 1) {
-    labelNombres.textContent = 'Nombre de quien asistirá';
-    nombresInput.placeholder = 'Escribe tu nombre completo';
-  }
+  individual = maxA + maxN === 1;
 }
 
 function asiste() {
@@ -55,9 +55,17 @@ function asiste() {
 
 function actualizarCampos() {
   const va = asiste();
-  campoPases.hidden = !va;
-  campoNombres.hidden = !va;
-  nombresInput.required = va;
+  campoPases.hidden = !va || individual;
+  campoNombres.hidden = !va || individual;
+  nombresInput.required = va && !individual;
+}
+
+// "3 lugares (2 adultos y 1 niño)" / "2 lugares"
+function lugaresTxt(adultos, ninos) {
+  const total = adultos + ninos;
+  const base = `${total} ${total === 1 ? 'lugar' : 'lugares'}`;
+  if (!ninos || !adultos) return base;
+  return `${base} (${adultos} ${adultos === 1 ? 'adulto' : 'adultos'} y ${ninos} ${ninos === 1 ? 'niño' : 'niños'})`;
 }
 
 // El código viene en el enlace personal: ?inv=CODIGO  (también se acepta ?i=)
@@ -99,7 +107,7 @@ async function init() {
     const va = asiste();
     const pasesAdultos = va ? Number(selectAdultos.value) : 0;
     const pasesNinos = va ? Number(selectNinos.value) : 0;
-    const nombresAsistentes = nombresInput.value.trim() || invitado.nombre;
+    const nombresAsistentes = individual ? invitado.nombre : (nombresInput.value.trim() || invitado.nombre);
     const mensaje = document.getElementById('mensaje').value.trim();
 
     if (va && pasesAdultos + pasesNinos === 0) {
@@ -107,7 +115,7 @@ async function init() {
       statusEl.className = 'form-status form-status--error';
       return;
     }
-    if (va && !nombresInput.value.trim()) {
+    if (va && !individual && !nombresInput.value.trim()) {
       statusEl.textContent = 'Por favor escribe los nombres de los asistentes.';
       statusEl.className = 'form-status form-status--error';
       return;
@@ -136,9 +144,16 @@ async function init() {
       return;
     }
 
-    if (!va) {
+    // Mensaje concreto (qué quedó registrado); el agradecimiento y el
+    // "Los esperamos" ya están en el cierre de la invitación.
+    if (va) {
+      successTitle.textContent = '¡Confirmado!';
+      successText.textContent = individual
+        ? 'Tu lugar ya está reservado.'
+        : `Reservamos ${lugaresTxt(pasesAdultos, pasesNinos)} a nombre de ${invitado.nombre}.`;
+    } else {
       successTitle.textContent = 'Te vamos a extrañar';
-      successText.textContent = 'Gracias por avisarnos. Sabemos que estarás con nosotros de corazón.';
+      successText.textContent = 'Lamentamos que no puedas acompañarnos. Te tendremos presentes ese día.';
     }
     form.reset();
     form.hidden = true;

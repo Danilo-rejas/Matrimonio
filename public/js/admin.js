@@ -147,6 +147,7 @@ function escuchar() {
     onSnapshot(query(collection(db, 'invitados'), orderBy('nombre')), (snap) => {
       state.invitados = aLista(snap);
       render();
+      migrarRespuestasAntiguas();
     }, onError),
     onSnapshot(query(collection(db, 'mesas'), orderBy('orden')), (snap) => {
       state.mesas = aLista(snap);
@@ -155,6 +156,7 @@ function escuchar() {
     onSnapshot(query(collection(db, 'rsvps'), orderBy('creadoEn', 'desc')), (snap) => {
       state.rsvps = aLista(snap);
       render();
+      migrarRespuestasAntiguas();
     }, onError)
   );
 }
@@ -162,6 +164,36 @@ function escuchar() {
 // Última respuesta de cada invitado (los rsvps vienen ordenados del más nuevo al más viejo)
 function respuestaDe(invitadoId) {
   return state.rsvps.find((r) => r.invitadoId === invitadoId) || null;
+}
+
+// Las respuestas ahora se guardan con el código del enlace como id (rsvps/CODIGO),
+// así el invitado que vuelve a abrir su enlace ve que ya respondió y no puede
+// responder otra vez. Las que llegaron antes tienen un id cualquiera: se pasan
+// a rsvps/CODIGO (copiar y borrar en un mismo lote). Si alguien respondió varias
+// veces, se pasa la última y las anteriores quedan como estaban.
+let migrando = false;
+async function migrarRespuestasAntiguas() {
+  if (migrando) return;
+  const ids = new Set(state.rsvps.map((r) => r.id));
+  const pendientes = state.invitados
+    .filter((inv) => inv.codigo && !ids.has(inv.codigo) && respuestaDe(inv.id));
+  if (!pendientes.length) return;
+
+  migrando = true;
+  try {
+    for (let i = 0; i < pendientes.length; i += 200) {
+      const batch = writeBatch(db);
+      for (const inv of pendientes.slice(i, i + 200)) {
+        const { id, ...datos } = respuestaDe(inv.id);
+        batch.set(doc(db, 'rsvps', inv.codigo), datos);
+        batch.delete(doc(db, 'rsvps', id));
+      }
+      await batch.commit();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  migrando = false;
 }
 
 // 'confirmo' | 'no_asiste' | 'sin_respuesta'

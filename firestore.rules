@@ -30,7 +30,9 @@ service cloud.firestore {
     }
 
     // Confirmaciones: cualquiera puede enviar UNA confirmación válida (sin sesión).
-    // Solo los novios pueden verlas, editarlas o borrarlas.
+    // La invitación la guarda con el código del enlace como id (rsvps/CODIGO):
+    // responder otra vez sería una actualización, y eso solo lo pueden los novios.
+    // Solo los novios pueden listarlas, editarlas o borrarlas.
     match /rsvps/{id} {
       allow create: if novios() || (
         request.resource.data.keys().hasOnly(
@@ -51,7 +53,10 @@ service cloud.firestore {
         && request.resource.data.mensaje.size() <= 1000
         && request.resource.data.asiste is bool
       );
-      allow read, update, delete: if novios();
+      // Con su código el invitado puede ver su propia respuesta (para mostrarle
+      // que ya respondió en lugar del formulario).
+      allow get: if novios() || exists(/databases/$(database)/documents/enlaces/$(id));
+      allow list, update, delete: if novios();
     }
 
     // Enlaces únicos: un invitado que tiene su token puede LEER solo ese

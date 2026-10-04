@@ -1,4 +1,4 @@
-import { db, collection, doc, getDoc, addDoc, serverTimestamp } from './firebase-config.js?v=3';
+import { db, doc, getDoc, setDoc, serverTimestamp } from './firebase-config.js?v=3';
 
 const form = document.getElementById('rsvp-form');
 const statusEl = document.getElementById('rsvp-status');
@@ -68,6 +68,36 @@ function lugaresTxt(adultos, ninos) {
   return `${base} (${adultos} ${adultos === 1 ? 'adulto' : 'adultos'} y ${ninos} ${ninos === 1 ? 'niño' : 'niños'})`;
 }
 
+// Agradecimiento según la respuesta. Se muestra al enviar y también cada vez
+// que el invitado vuelve a abrir su enlace: se responde una sola vez.
+function mostrarRespuesta(invitado, r) {
+  if (r.asiste === false) {
+    successTitle.textContent = 'Gracias por avisarnos';
+    successText.textContent = 'Sentiremos tu ausencia, pero te llevaremos en el corazón ese día.';
+  } else {
+    const adultos = Number(r.pasesAdultos ?? r.cantidadPases) || 0;
+    const ninos = Number(r.pasesNinos) || 0;
+    successTitle.textContent = '¡Gracias por confirmar!';
+    successText.textContent = adultos + ninos <= 1
+      ? 'Tu lugar ya está reservado.'
+      : `Reservamos ${lugaresTxt(adultos, ninos)} a nombre de ${invitado.nombre}.`;
+  }
+  form.hidden = true;
+  successEl.hidden = false;
+}
+
+// La respuesta se guarda con el código del enlace como id (rsvps/CODIGO):
+// así se sabe si ya respondió y las reglas no dejan responder otra vez.
+async function respuestaPrevia(codigo) {
+  try {
+    const snap = await getDoc(doc(db, 'rsvps', codigo));
+    return snap.exists() ? snap.data() : null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 // El código viene en el enlace personal: ?inv=CODIGO  (también se acepta ?i=)
 function codigoDelEnlace() {
   const params = new URLSearchParams(window.location.search);
@@ -92,6 +122,12 @@ async function init() {
   }
   if (!invitado) {
     invalidEl.hidden = false;
+    return;
+  }
+
+  const previa = await respuestaPrevia(codigo);
+  if (previa) {
+    mostrarRespuesta(invitado, previa);
     return;
   }
 
@@ -125,39 +161,36 @@ async function init() {
     statusEl.textContent = 'Enviando...';
     statusEl.className = 'form-status';
 
+    const respuesta = {
+      invitadoId: invitado.invitadoId,
+      asiste: va,
+      pasesAdultos,
+      pasesNinos,
+      cantidadPases: pasesAdultos + pasesNinos,
+      nombresAsistentes,
+      mensaje,
+      creadoEn: serverTimestamp()
+    };
+
     try {
-      await addDoc(collection(db, 'rsvps'), {
-        invitadoId: invitado.invitadoId,
-        asiste: va,
-        pasesAdultos,
-        pasesNinos,
-        cantidadPases: pasesAdultos + pasesNinos,
-        nombresAsistentes,
-        mensaje,
-        creadoEn: serverTimestamp()
-      });
+      await setDoc(doc(db, 'rsvps', invitado.codigo), respuesta);
     } catch (err) {
       console.error(err);
+      // Si ya había respondido (por ejemplo desde otro celular), se muestra esa respuesta
+      const previaAlEnviar = await respuestaPrevia(invitado.codigo);
+      if (previaAlEnviar) {
+        mostrarRespuesta(invitado, previaAlEnviar);
+        successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
       statusEl.textContent = 'Hubo un problema al enviar tu confirmación. Intenta de nuevo.';
       statusEl.className = 'form-status form-status--error';
       submitBtn.disabled = false;
       return;
     }
 
-    // Mensaje concreto (qué quedó registrado); el agradecimiento y el
-    // "Los esperamos" ya están en el cierre de la invitación.
-    if (va) {
-      successTitle.textContent = '¡Confirmado!';
-      successText.textContent = individual
-        ? 'Tu lugar ya está reservado.'
-        : `Reservamos ${lugaresTxt(pasesAdultos, pasesNinos)} a nombre de ${invitado.nombre}.`;
-    } else {
-      successTitle.textContent = 'Te vamos a extrañar';
-      successText.textContent = 'Lamentamos que no puedas acompañarnos. Te tendremos presentes ese día.';
-    }
     form.reset();
-    form.hidden = true;
-    successEl.hidden = false;
+    mostrarRespuesta(invitado, respuesta);
     successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 }

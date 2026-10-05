@@ -3,9 +3,13 @@ import { db, doc, getDoc, setDoc, serverTimestamp } from './firebase-config.js?v
 const form = document.getElementById('rsvp-form');
 const statusEl = document.getElementById('rsvp-status');
 const submitBtn = document.getElementById('rsvp-submit');
-const successEl = document.getElementById('rsvp-success');
-const successTitle = document.getElementById('rsvp-success-title');
-const successText = document.getElementById('rsvp-success-text');
+const rsvpSection = document.getElementById('rsvp');
+// Foto del cierre: su mensaje cambia según la respuesta
+const cierre = document.getElementById('cierre');
+const cierreTexto = document.getElementById('cierre-texto');
+const cierreEyebrow = document.getElementById('cierre-eyebrow');
+const cierreTitulo = document.getElementById('cierre-titulo');
+const cierreDetalle = document.getElementById('cierre-detalle');
 const invalidEl = document.getElementById('rsvp-invalid');
 const greetingEl = document.getElementById('rsvp-greeting');
 const selectAdultos = document.getElementById('pasesAdultos');
@@ -68,22 +72,35 @@ function lugaresTxt(adultos, ninos) {
   return `${base} (${adultos} ${adultos === 1 ? 'adulto' : 'adultos'} y ${ninos} ${ninos === 1 ? 'niño' : 'niños'})`;
 }
 
-// Agradecimiento según la respuesta. Se muestra al enviar y también cada vez
-// que el invitado vuelve a abrir su enlace: se responde una sola vez.
+// Una vez que respondió (al enviar, o cada vez que vuelve a abrir su enlace):
+// la sección del formulario desaparece y el agradecimiento va en la foto del
+// cierre, según lo que respondió. Se responde una sola vez.
 function mostrarRespuesta(invitado, r) {
   if (r.asiste === false) {
-    successTitle.textContent = 'Gracias por avisarnos';
-    successText.textContent = 'Sentiremos tu ausencia, pero te llevaremos en el corazón ese día.';
+    cierreEyebrow.textContent = 'Gracias por avisarnos';
+    cierreTitulo.textContent = 'Te extrañaremos';
+    cierreDetalle.textContent = 'Sentiremos tu ausencia, pero te llevaremos en el corazón ese día.';
   } else {
     const adultos = Number(r.pasesAdultos ?? r.cantidadPases) || 0;
     const ninos = Number(r.pasesNinos) || 0;
-    successTitle.textContent = '¡Gracias por confirmar!';
-    successText.textContent = adultos + ninos <= 1
-      ? 'Tu lugar ya está reservado.'
-      : `Reservamos ${lugaresTxt(adultos, ninos)} a nombre de ${invitado.nombre}.`;
+    const total = adultos + ninos;
+    cierreEyebrow.textContent = 'Gracias por confirmar';
+    cierreTitulo.textContent = total > 1 ? 'Los esperamos' : 'Te esperamos';
+    cierreDetalle.textContent = total > 1
+      ? `Reservamos ${lugaresTxt(adultos, ninos)} a nombre de ${invitado.nombre}.`
+      : 'Tu lugar ya está reservado.';
   }
-  form.hidden = true;
-  successEl.hidden = false;
+  cierreDetalle.hidden = false;
+  rsvpSection.hidden = true;
+}
+
+// Justo después de enviar: baja a la foto del cierre y su mensaje aparece suave
+function irAlCierre() {
+  cierre.classList.add('reveal--visible');
+  cierreTexto.classList.remove('foto-banner__inner--respuesta');
+  void cierreTexto.offsetWidth; // reinicia la animación
+  cierreTexto.classList.add('foto-banner__inner--respuesta');
+  cierre.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // La respuesta se guarda con el código del enlace como id (rsvps/CODIGO):
@@ -180,7 +197,7 @@ async function init() {
       const previaAlEnviar = await respuestaPrevia(invitado.codigo);
       if (previaAlEnviar) {
         mostrarRespuesta(invitado, previaAlEnviar);
-        successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        irAlCierre();
         return;
       }
       statusEl.textContent = 'Hubo un problema al enviar tu confirmación. Intenta de nuevo.';
@@ -191,7 +208,7 @@ async function init() {
 
     form.reset();
     mostrarRespuesta(invitado, respuesta);
-    successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    irAlCierre();
   });
 }
 

@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=63">
+<link rel="stylesheet" href="css/style.css?v=64">
 </head>
 <body class="cover-active">
 
@@ -457,17 +457,15 @@
     <p class="form-status" id="rsvp-status"></p>
   </form>
 
-  <div class="rsvp-success" id="rsvp-success" hidden>
-    <h2 id="rsvp-success-title">¡Gracias por confirmar!</h2>
-    <p id="rsvp-success-text">Tu respuesta quedó registrada.</p>
-  </div>
 </section>
 
-<section class="foto-banner foto-banner--final reveal" data-parallax>
+<!-- Cierre: cuando el invitado responde, rsvp.js cambia este mensaje según su respuesta -->
+<section class="foto-banner foto-banner--final reveal" id="cierre" data-parallax>
   <img class="foto-banner__img" src="img/fotos/banner-final.jpg" alt="" loading="lazy">
-  <div class="foto-banner__inner">
-    <p class="eyebrow">Gracias por acompañarnos</p>
-    <p class="foto-banner__titulo">Los esperamos</p>
+  <div class="foto-banner__inner" id="cierre-texto">
+    <p class="eyebrow" id="cierre-eyebrow">Gracias por acompañarnos</p>
+    <p class="foto-banner__titulo" id="cierre-titulo">Los esperamos</p>
+    <p class="foto-banner__detalle" id="cierre-detalle" hidden></p>
     <p class="foto-banner__fecha">12 · 12 · 2026</p>
   </div>
 </section>
@@ -489,6 +487,6 @@
 <script src="js/reveal.js?v=3"></script>
 <script src="js/fotos.js?v=2"></script>
 <script src="js/musica.js?v=1"></script>
-<script type="module" src="js/rsvp.js?v=9"></script>
+<script type="module" src="js/rsvp.js?v=10"></script>
 </body>
 </html>

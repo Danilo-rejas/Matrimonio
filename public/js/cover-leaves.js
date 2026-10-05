@@ -42,7 +42,12 @@
     wrap.addEventListener('animationend', function () { wrap.remove(); });
   }
 
+  // También la usa rsvp.js para celebrar cuando alguien confirma su asistencia
+  window.lluviaDeHojas = function (cantidad) {
+    for (var i = 0; i < (cantidad || SPAWN_COUNT); i++) spawnLeaf();
+  };
+
   openBtn.addEventListener('click', function () {
-    for (var i = 0; i < SPAWN_COUNT; i++) spawnLeaf();
+    window.lluviaDeHojas(SPAWN_COUNT);
   });
 })();

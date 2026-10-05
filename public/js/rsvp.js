@@ -10,6 +10,8 @@ const cierreTexto = document.getElementById('cierre-texto');
 const cierreEyebrow = document.getElementById('cierre-eyebrow');
 const cierreTitulo = document.getElementById('cierre-titulo');
 const cierreDetalle = document.getElementById('cierre-detalle');
+const cierreLugares = document.getElementById('cierre-lugares');
+const cierreBoton = document.getElementById('cierre-boton');
 const invalidEl = document.getElementById('rsvp-invalid');
 const greetingEl = document.getElementById('rsvp-greeting');
 const selectAdultos = document.getElementById('pasesAdultos');
@@ -64,44 +66,66 @@ function actualizarCampos() {
   nombresInput.required = va && !individual;
 }
 
-// "3 lugares (2 adultos y 1 niño)" / "2 lugares"
-function lugaresTxt(adultos, ninos) {
+// Etiqueta dorada: "Tu lugar está reservado" / "2 lugares reservados" /
+// "5 lugares reservados" y debajo, más pequeño, "3 adultos y 2 niños"
+function ponerLugares(adultos, ninos) {
   const total = adultos + ninos;
-  const base = `${total} ${total === 1 ? 'lugar' : 'lugares'}`;
-  if (!ninos || !adultos) return base;
-  return `${base} (${adultos} ${adultos === 1 ? 'adulto' : 'adultos'} y ${ninos} ${ninos === 1 ? 'niño' : 'niños'})`;
+  cierreLugares.textContent = total <= 1 ? 'Tu lugar está reservado' : `${total} lugares reservados`;
+  if (adultos && ninos) {
+    const detalle = document.createElement('span');
+    detalle.className = 'foto-banner__lugares-detalle';
+    detalle.textContent = `${adultos} ${adultos === 1 ? 'adulto' : 'adultos'} y ${ninos} ${ninos === 1 ? 'niño' : 'niños'}`;
+    cierreLugares.appendChild(detalle);
+  }
+}
+
+// Foto del cierre mientras no responde: "Con mucha ilusión · Esperamos tu
+// respuesta" y un botón que lleva al formulario (ese es el texto del HTML).
+function prepararCierrePendiente(invitado) {
+  const varios = (Number(invitado.maxAdultos) || 0) + (Number(invitado.maxNinos) || 0) > 1;
+  cierreDetalle.textContent = `Nada nos haría más felices que compartir este día ${varios ? 'con ustedes' : 'contigo'}.`;
 }
 
 // Una vez que respondió (al enviar, o cada vez que vuelve a abrir su enlace):
-// la sección del formulario desaparece y el agradecimiento va en la foto del
-// cierre, según lo que respondió. Se responde una sola vez.
-function mostrarRespuesta(invitado, r) {
+// la sección del formulario desaparece y el mensaje de la foto del cierre
+// cambia según lo que respondió. Se responde una sola vez.
+function mostrarRespuesta(r) {
   if (r.asiste === false) {
     cierreEyebrow.textContent = 'Gracias por avisarnos';
     cierreTitulo.textContent = 'Te extrañaremos';
     cierreDetalle.textContent = 'Sentiremos tu ausencia, pero te llevaremos en el corazón ese día.';
+    cierreLugares.hidden = true;
   } else {
     const adultos = Number(r.pasesAdultos ?? r.cantidadPases) || 0;
     const ninos = Number(r.pasesNinos) || 0;
-    const total = adultos + ninos;
+    const varios = adultos + ninos > 1;
     cierreEyebrow.textContent = 'Gracias por confirmar';
-    cierreTitulo.textContent = total > 1 ? 'Los esperamos' : 'Te esperamos';
-    cierreDetalle.textContent = total > 1
-      ? `Reservamos ${lugaresTxt(adultos, ninos)} a nombre de ${invitado.nombre}.`
-      : 'Tu lugar ya está reservado.';
+    cierreTitulo.textContent = varios ? '¡Los esperamos!' : '¡Te esperamos!';
+    cierreDetalle.textContent = `Nos llena el corazón de alegría saber que ${varios ? 'estarán' : 'estarás'} a nuestro lado en este día tan especial.`;
+    ponerLugares(adultos, ninos);
+    cierreLugares.hidden = false;
   }
-  cierreDetalle.hidden = false;
+  cierreBoton.hidden = true;
   rsvpSection.hidden = true;
 }
 
-// Justo después de enviar: baja a la foto del cierre y su mensaje aparece suave
-function irAlCierre() {
+// Justo después de enviar: baja a la foto del cierre, su mensaje aparece suave
+// y, si confirmó, caen hojas de acuarela como en la portada.
+function irAlCierre(celebrar) {
   cierre.classList.add('reveal--visible');
   cierreTexto.classList.remove('foto-banner__inner--respuesta');
   void cierreTexto.offsetWidth; // reinicia la animación
   cierreTexto.classList.add('foto-banner__inner--respuesta');
   cierre.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (celebrar && !sinMovimiento && window.lluviaDeHojas) setTimeout(() => window.lluviaDeHojas(22), 600);
 }
+
+// El botón de la foto lleva al formulario con desplazamiento suave
+cierreBoton.addEventListener('click', (event) => {
+  event.preventDefault();
+  rsvpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 // La respuesta se guarda con el código del enlace como id (rsvps/CODIGO):
 // así se sabe si ya respondió y las reglas no dejan responder otra vez.
@@ -144,12 +168,13 @@ async function init() {
 
   const previa = await respuestaPrevia(codigo);
   if (previa) {
-    mostrarRespuesta(invitado, previa);
+    mostrarRespuesta(previa);
     return;
   }
 
   greetingEl.textContent = `Confirmando para: ${invitado.nombre}`;
   prepararPases(invitado);
+  prepararCierrePendiente(invitado);
   form.hidden = false;
   form.querySelectorAll('input[name="asiste"]').forEach((r) => r.addEventListener('change', actualizarCampos));
   actualizarCampos();
@@ -196,8 +221,8 @@ async function init() {
       // Si ya había respondido (por ejemplo desde otro celular), se muestra esa respuesta
       const previaAlEnviar = await respuestaPrevia(invitado.codigo);
       if (previaAlEnviar) {
-        mostrarRespuesta(invitado, previaAlEnviar);
-        irAlCierre();
+        mostrarRespuesta(previaAlEnviar);
+        irAlCierre(false);
         return;
       }
       statusEl.textContent = 'Hubo un problema al enviar tu confirmación. Intenta de nuevo.';
@@ -207,8 +232,8 @@ async function init() {
     }
 
     form.reset();
-    mostrarRespuesta(invitado, respuesta);
-    irAlCierre();
+    mostrarRespuesta(respuesta);
+    irAlCierre(va);
   });
 }
 

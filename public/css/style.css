@@ -1469,6 +1469,58 @@ body.cover-active {
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
 }
 
+.foto-banner__adorno { display: block; width: 150px; margin: 0.15rem auto 0.9rem; opacity: 0.9; }
+.foto-banner__lugares[hidden],
+.foto-banner__boton[hidden] { display: none; }
+
+/* Mientras no responde: lleva al formulario */
+.foto-banner__boton {
+  display: inline-block;
+  margin: 0 auto 1.25rem;
+  padding: 0.78rem 1.6rem;
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-accent-dark);
+  background: #fff7ea;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.55);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.foto-banner__boton:hover { background: #fff; transform: translateY(-2px); }
+
+/* "5 lugares reservados · 3 adultos y 2 niños" */
+.foto-banner__lugares {
+  display: inline-block;
+  margin: 0 auto 1.15rem;
+  padding: 0.42rem 1.05rem;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff7ea;
+  background: rgba(217, 164, 65, 0.2);
+  border: 1px solid rgba(217, 164, 65, 0.75);
+  border-radius: 999px;
+}
+
+.foto-banner__lugares-detalle {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(255, 247, 234, 0.85);
+}
+
+.foto-banner__lugares:has(.foto-banner__lugares-detalle) { border-radius: 18px; padding: 0.55rem 1.3rem; }
+
 .foto-banner__inner--respuesta { animation: cierre-respuesta 0.9s ease both; }
 
 @keyframes cierre-respuesta {
